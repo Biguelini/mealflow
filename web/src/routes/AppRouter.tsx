@@ -17,7 +17,6 @@ export function AppRouter() {
         }
       />
 
-      {/* qualquer rota desconhecida redireciona pro dashboard (ou login) */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
