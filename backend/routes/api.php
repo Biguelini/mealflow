@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HouseholdController;
+use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\MealPlanController;
 use App\Http\Controllers\PantryController;
 use App\Http\Controllers\RecipeController;
@@ -46,8 +47,13 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::post('/', [MealPlanController::class, 'store']);
 	});
 
-	Route::post('/meal-plans', [MealPlanController::class, 'store']);
-	Route::get('/meal-plans', [MealPlanController::class, 'index']);
-
 	Route::post('/shopping-lists/from-meal-plan/{mealPlanId}', [ShoppingListController::class, 'fromMealPlan']);
+
+	Route::prefix('ingredients')->group(function () {
+		Route::get('/', [IngredientController::class, 'index']);
+		Route::post('/', [IngredientController::class, 'store']);
+		Route::get('/{id}', [IngredientController::class, 'show']);
+		Route::put('/{id}', [IngredientController::class, 'update']);
+		Route::delete('/{id}', [IngredientController::class, 'destroy']);
+	});
 });

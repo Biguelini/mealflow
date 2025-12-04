@@ -4,13 +4,10 @@ import { LoginPage } from "@/pages/auth/LoginPage";
 import { RegisterPage } from "@/pages/auth/RegisterPage";
 import { AuthProvider } from "@/context/AuthContext";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { RecipesPage } from "./pages/app/RecipesPage";
 
 function DashboardPage() {
   return <div className="text-sm">Dashboard (resumo da semana)</div>;
-}
-
-function RecipesPage() {
-  return <div className="text-sm">Receitas</div>;
 }
 
 function PantryPage() {
@@ -34,11 +31,9 @@ export function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* públicas */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
-          {/* área autenticada com layout base */}
           <Route
             path="/app"
             element={
@@ -55,7 +50,6 @@ export function App() {
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 
-          {/* fallback: manda pra /app (que é protegido) */}
           <Route
             path="*"
             element={

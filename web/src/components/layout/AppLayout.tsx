@@ -31,7 +31,6 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      {/* Sidebar - desktop */}
       <aside className="hidden md:flex md:w-64 md:flex-col border-r border-border bg-card">
         <div className="flex h-14 items-center gap-2 border-b border-border px-4">
           <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground text-sm font-semibold">
@@ -67,9 +66,7 @@ export function AppLayout() {
         </div>
       </aside>
 
-      {/* Conteúdo principal */}
       <div className="flex flex-1 flex-col">
-        {/* Header - aparece em todas telas, inclusive mobile */}
         <header className="flex h-14 items-center justify-between border-b border-border bg-card px-4">
           <div className="flex flex-col">
             <span className="text-xs uppercase tracking-wide text-muted-foreground">
@@ -80,13 +77,11 @@ export function AppLayout() {
             </span>
           </div>
 
-          {/* Em mobile, o "menu" é só uma indicação do que existe no desktop */}
           <div className="md:hidden text-xs text-muted-foreground">
             Menu na lateral em telas maiores
           </div>
         </header>
 
-        {/* Conteúdo */}
         <main className="flex-1 p-4">
           <div className="mx-auto max-w-6xl">
             <Outlet />
