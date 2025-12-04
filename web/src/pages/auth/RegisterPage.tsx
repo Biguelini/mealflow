@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Card,
@@ -12,17 +12,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function LoginPage() {
-  const { login } = useAuth();
+export function RegisterPage() {
+  const { register } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation() as any;
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const from = location.state?.from?.pathname ?? "/app";
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -30,10 +28,10 @@ export function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
-      navigate(from, { replace: true });
+      await register(name, email, password);
+      navigate("/app", { replace: true });
     } catch (err: any) {
-      setError(err.message ?? "Erro ao fazer login.");
+      setError(err.message ?? "Erro ao registrar.");
     } finally {
       setLoading(false);
     }
@@ -43,9 +41,9 @@ export function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Entrar</CardTitle>
+          <CardTitle>Criar conta</CardTitle>
           <CardDescription>
-            Acesse seu painel MealFlow para planejar suas refeições.
+            Comece a organizar as refeições da sua casa.
           </CardDescription>
         </CardHeader>
 
@@ -56,6 +54,17 @@ export function LoginPage() {
                 {error}
               </p>
             )}
+
+            <div className="space-y-2">
+              <Label htmlFor="name">Nome</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Seu nome"
+                required
+              />
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
@@ -75,7 +84,7 @@ export function LoginPage() {
               <Input
                 id="password"
                 type="password"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -83,16 +92,16 @@ export function LoginPage() {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Entrando..." : "Entrar"}
+              {loading ? "Criando conta..." : "Criar conta"}
             </Button>
 
             <p className="text-xs text-muted-foreground text-center">
-              Não tem conta ainda?{" "}
+              Já tem conta?{" "}
               <Link
-                to="/register"
+                to="/login"
                 className="text-primary underline-offset-4 hover:underline"
               >
-                Criar conta
+                Fazer login
               </Link>
             </p>
           </form>

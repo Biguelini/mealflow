@@ -1,17 +1,26 @@
-import { Navigate } from "react-router-dom";
 import { type ReactNode } from "react";
-import { useAuth } from "../hooks/useAuth";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 type PrivateRouteProps = {
-	children: ReactNode;
+  children: ReactNode;
 };
 
 export function PrivateRoute({ children }: PrivateRouteProps) {
-	const { isAuthenticated } = useAuth();
+  const { user, loading } = useAuth();
+  const location = useLocation();
 
-	if (!isAuthenticated) {
-		return <Navigate to="/login" replace />;
-	}
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <span className="text-sm text-muted-foreground">Carregando...</span>
+      </div>
+    );
+  }
 
-	return <>{children}</>;
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  return <>{children}</>;
 }
