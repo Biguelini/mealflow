@@ -38,19 +38,27 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Criar conta</CardTitle>
-          <CardDescription>
-            Comece a organizar as refeições da sua casa.
-          </CardDescription>
+    <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
+      <div className="w-full max-w-md">
+        <Card className="shadow-elevated border">
+          <CardHeader className="space-y-4 pb-6">
+            <div className="mx-auto w-20 h-20 bg-primary rounded-3xl flex items-center justify-center shadow-xl">
+              <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+            </div>
+            <CardTitle className="text-3xl text-center font-bold text-foreground">
+              Criar Conta
+            </CardTitle>
+            <CardDescription className="text-center text-base">
+              Comece a organizar refeições saudáveis para sua casa
+            </CardDescription>
         </CardHeader>
 
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit}>
+        <CardContent className="px-6 pb-6">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             {error && (
-              <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+              <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-4 py-3 font-medium">
                 {error}
               </p>
             )}
@@ -91,22 +99,22 @@ export function RegisterPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
               {loading ? "Criando conta..." : "Criar conta"}
             </Button>
 
-            <p className="text-xs text-muted-foreground text-center">
+            <p className="text-sm text-muted-foreground text-center pt-2">
               Já tem conta?{" "}
               <Link
                 to="/login"
-                className="text-primary underline-offset-4 hover:underline"
-              >
+                className="text-primary font-semibold underline-offset-4 hover:underline">
                 Fazer login
               </Link>
             </p>
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

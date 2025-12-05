@@ -2,9 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HouseholdController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\MealPlanController;
+use App\Http\Controllers\MealTypeController;
 use App\Http\Controllers\PantryController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\ShoppingListController;
@@ -45,9 +47,13 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::prefix('meal-plans')->group(function () {
 		Route::post('/search', [MealPlanController::class, 'search']);
 		Route::post('/', [MealPlanController::class, 'store']);
+		Route::put('/{id}', [MealPlanController::class, 'update']);
 	});
 
-	Route::post('/shopping-lists/from-meal-plan/{mealPlanId}', [ShoppingListController::class, 'fromMealPlan']);
+	Route::prefix('shopping-lists')->group(function () {
+		Route::post('/search', [ShoppingListController::class, 'search']);
+		Route::post('/from-meal-plan/{mealPlanId}', [ShoppingListController::class, 'fromMealPlan']);
+	});
 
 	Route::prefix('ingredients')->group(function () {
 		Route::get('/', [IngredientController::class, 'index']);
@@ -56,4 +62,13 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::put('/{id}', [IngredientController::class, 'update']);
 		Route::delete('/{id}', [IngredientController::class, 'destroy']);
 	});
+
+	Route::prefix('meal-types')->group(function () {
+		Route::get('/', [MealTypeController::class, 'index']);
+		Route::post('/', [MealTypeController::class, 'store']);
+		Route::put('/{id}', [MealTypeController::class, 'update']);
+		Route::delete('/{id}', [MealTypeController::class, 'destroy']);
+	});
+
+	Route::post('/dashboard/weekly-summary', [DashboardController::class, 'weeklySummary']);
 });

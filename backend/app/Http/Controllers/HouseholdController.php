@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Household;
+use App\Models\MealType;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -30,6 +31,21 @@ class HouseholdController extends Controller {
 		]);
 
 		$household->users()->attach($user->id, ['role' => 'owner']);
+
+
+		$defaultMealTypes = [
+			['name' => 'Café da manhã', 'order' => 1],
+			['name' => 'Almoço', 'order' => 2],
+			['name' => 'Janta', 'order' => 3],
+		];
+
+		foreach ($defaultMealTypes as $mealType) {
+			MealType::create([
+				'household_id' => $household->id,
+				'name' => $mealType['name'],
+				'order' => $mealType['order'],
+			]);
+		}
 
 		return response()->json($household->load('owner:id,name,email'), 201);
 	}

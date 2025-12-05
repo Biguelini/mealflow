@@ -79,20 +79,22 @@ class RecipeController extends Controller {
 		]);
 
 
-		if (!empty($validated['ingredients'])) {
-			$pivotData = [];
-			foreach ($validated['ingredients'] as $item) {
-				$pivotData[$item['ingredient_id']] = [
-					'quantity' => $item['quantity'] ?? null,
-					'unit'     => $item['unit'] ?? null,
-					'notes'    => $item['notes'] ?? null,
-				];
-			}
+	if (!empty($validated['ingredients'])) {
+		$pivotData = [];
+		foreach ($validated['ingredients'] as $item) {
 
-			$recipe->ingredients()->sync($pivotData);
+			$ingredient = \App\Models\Ingredient::find($item['ingredient_id']);
+			$unit = $ingredient ? $ingredient->default_unit : null;
+			
+			$pivotData[$item['ingredient_id']] = [
+				'quantity' => $item['quantity'] ?? null,
+				'unit'     => $unit,
+				'notes'    => $item['notes'] ?? null,
+			];
 		}
 
-		return response()->json(
+		$recipe->ingredients()->sync($pivotData);
+	}		return response()->json(
 			$recipe->load(['ingredients', 'owner:id,name']),
 			201
 		);
@@ -144,21 +146,23 @@ class RecipeController extends Controller {
 		$recipe->fill($validated);
 		$recipe->save();
 
-		if (array_key_exists('ingredients', $validated)) {
-			$pivotData = [];
+	if (array_key_exists('ingredients', $validated)) {
+		$pivotData = [];
 
-			foreach ($validated['ingredients'] ?? [] as $item) {
-				$pivotData[$item['ingredient_id']] = [
-					'quantity' => $item['quantity'] ?? null,
-					'unit'     => $item['unit'] ?? null,
-					'notes'    => $item['notes'] ?? null,
-				];
-			}
+		foreach ($validated['ingredients'] ?? [] as $item) {
 
-			$recipe->ingredients()->sync($pivotData);
+			$ingredient = \App\Models\Ingredient::find($item['ingredient_id']);
+			$unit = $ingredient ? $ingredient->default_unit : null;
+			
+			$pivotData[$item['ingredient_id']] = [
+				'quantity' => $item['quantity'] ?? null,
+				'unit'     => $unit,
+				'notes'    => $item['notes'] ?? null,
+			];
 		}
 
-		return response()->json(
+		$recipe->ingredients()->sync($pivotData);
+	}		return response()->json(
 			$recipe->load(['ingredients', 'owner:id,name'])
 		);
 	}

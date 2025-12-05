@@ -40,19 +40,27 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Entrar</CardTitle>
-          <CardDescription>
-            Acesse seu painel MealFlow para planejar suas refeições.
-          </CardDescription>
+    <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
+      <div className="w-full max-w-md">
+        <Card className="shadow-elevated border">
+          <CardHeader className="space-y-4 pb-6">
+            <div className="mx-auto w-20 h-20 bg-primary rounded-3xl flex items-center justify-center shadow-xl">
+              <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <CardTitle className="text-3xl text-center font-bold text-foreground">
+              Bem-vindo ao MealFlow
+            </CardTitle>
+            <CardDescription className="text-center text-base">
+              Acesse seu painel para planejar refeições saudáveis e nutritivas
+            </CardDescription>
         </CardHeader>
 
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit}>
+        <CardContent className="px-6 pb-6">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             {error && (
-              <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
+              <p className="text-sm text-destructive bg-destructive/10 rounded-lg px-4 py-3 font-medium">
                 {error}
               </p>
             )}
@@ -82,15 +90,15 @@ export function LoginPage() {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={loading}>
               {loading ? "Entrando..." : "Entrar"}
             </Button>
 
-            <p className="text-xs text-muted-foreground text-center">
+            <p className="text-sm text-muted-foreground text-center pt-2">
               Não tem conta ainda?{" "}
               <Link
                 to="/register"
-                className="text-primary underline-offset-4 hover:underline"
+                className="text-primary font-semibold underline-offset-4 hover:underline"
               >
                 Criar conta
               </Link>
@@ -98,6 +106,7 @@ export function LoginPage() {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

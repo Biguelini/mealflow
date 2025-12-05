@@ -13,6 +13,7 @@ class MealPlanItem extends Model
         'meal_plan_id',
         'date',
         'meal_type',
+        'meal_type_id',
         'recipe_id',
         'servings',
         'notes',
@@ -30,5 +31,10 @@ class MealPlanItem extends Model
     public function recipe()
     {
         return $this->belongsTo(Recipe::class);
+    }
+
+    public function mealType()
+    {
+        return $this->belongsTo(MealType::class);
     }
 }

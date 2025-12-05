@@ -25,6 +25,8 @@ class ShoppingListController extends Controller
             ->firstOrFail();
 
 
+        ShoppingList::where('meal_plan_id', $mealPlan->id)->delete();
+
         $neededByIngredient = [];
 
         foreach ($mealPlan->items as $item) {
@@ -128,5 +130,49 @@ class ShoppingListController extends Controller
             $shoppingList->load(['items.ingredient']),
             201
         );
+    }
+
+    public function search(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'household_id' => ['required', 'integer', 'exists:households,id'],
+            'week'         => ['required', 'string'],
+        ]);
+
+        $household = $user->households()
+            ->where('households.id', $validated['household_id'])
+            ->firstOrFail();
+
+        if (! str_contains($validated['week'], '-W')) {
+            return response()->json([
+                'message' => 'Formato de semana inválido. Use YYYY-WW.',
+            ], 422);
+        }
+
+        [$year, $week] = explode('-W', $validated['week'], 2);
+
+        $weekStart = Carbon::now()
+            ->setISODate((int) $year, (int) $week)
+            ->startOfWeek(Carbon::MONDAY);
+
+        $shoppingList = ShoppingList::with([
+            'items.ingredient',
+            'mealPlan',
+        ])
+            ->where('household_id', $household->id)
+            ->whereHas('mealPlan', function ($query) use ($weekStart) {
+                $query->whereDate('week_start_date', $weekStart->toDateString());
+            })
+            ->first();
+
+        if (! $shoppingList) {
+            return response()->json([
+                'message' => 'Nenhuma lista de compras encontrada para esta semana.',
+            ], 404);
+        }
+
+        return response()->json($shoppingList);
     }
 }

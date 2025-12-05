@@ -1,8 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "@/services/api";
-import { RecipeFilters } from "@/components/recipes/RecipeFilters";
+import { useHouseholdContext } from "@/context/HouseholdContext";
+import {
+	PageHeader,
+	PageContainer,
+	ErrorMessage,
+	LoadingState,
+	EmptyState,
+} from "@/components/common";
 import { RecipesList } from "@/components/recipes/RecipesList";
 import { RecipeFormDialog } from "@/components/recipes/RecipeFormDialog";
+import { useFormDialog } from "@/hooks/useFormDialog";
+import { Button } from "@/components/ui/button";
 import type {
 	Ingredient,
 	Recipe,
@@ -10,34 +19,21 @@ import type {
 	RecipeIngredient,
 } from "@/types/recipes";
 
-const HOUSEHOLD_ID = 1;
-
 export function RecipesPage() {
+	const { currentHousehold, isOwner } = useHouseholdContext();
 	const [recipes, setRecipes] = useState<Recipe[]>([]);
 	const [ingredients, setIngredients] = useState<Ingredient[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [loadingIngredients, setLoadingIngredients] = useState(false);
-
 	const [search, setSearch] = useState("");
-	const [selectedTag, setSelectedTag] = useState("");
-
 	const [listError, setListError] = useState<string | null>(null);
-	const [formError, setFormError] = useState<string | null>(null);
 
-	const [isDialogOpen, setIsDialogOpen] = useState(false);
-	const [saving, setSaving] = useState(false);
-
+	const formDialog = useFormDialog<Recipe>();
 	const [form, setForm] = useState<RecipeFormState>({
 		name: "",
 		description: "",
 		tagsText: "",
-		ingredients: [
-			{
-				ingredientId: "",
-				quantity: "",
-				unit: "",
-			},
-		],
+		ingredients: [{ ingredientId: "", quantity: "", unit: "" }],
 	});
 
 	const allTags = useMemo(() => {
@@ -47,6 +43,7 @@ export function RecipesPage() {
 		});
 		return Array.from(tags).sort();
 	}, [recipes]);
+
 
 	async function loadIngredients() {
 		try {
@@ -70,7 +67,7 @@ export function RecipesPage() {
 			const data = await apiFetch<{ data: Recipe[] }>("/recipes/search", {
 				method: "POST",
 				data: {
-					household_id: HOUSEHOLD_ID,
+					household_id: currentHousehold?.id,
 					q: search || null,
 				},
 			});
@@ -90,7 +87,7 @@ export function RecipesPage() {
 
 	useEffect(() => {
 		loadRecipes();
-	}, [search]);
+	}, [search, currentHousehold?.id]);
 
 	function openCreateDialog() {
 		setForm({
@@ -98,16 +95,9 @@ export function RecipesPage() {
 			name: "",
 			description: "",
 			tagsText: "",
-			ingredients: [
-				{
-					ingredientId: "",
-					quantity: "",
-					unit: "",
-				},
-			],
+			ingredients: [{ ingredientId: "", quantity: "", unit: "" }],
 		});
-		setFormError(null);
-		setIsDialogOpen(true);
+		formDialog.open();
 	}
 
 	function openEditDialog(recipe: Recipe) {
@@ -121,16 +111,9 @@ export function RecipesPage() {
 					ingredientId: String(ing.id),
 					quantity: ing.pivot.quantity ?? "",
 					unit: ing.pivot.unit ?? "",
-				})) ?? [
-					{
-						ingredientId: "",
-						quantity: "",
-						unit: "",
-					},
-				],
+				})) ?? [{ ingredientId: "", quantity: "", unit: "" }],
 		});
-		setFormError(null);
-		setIsDialogOpen(true);
+		formDialog.open(recipe);
 	}
 
 	function handleChangeField<K extends keyof RecipeFormState>(
@@ -183,12 +166,12 @@ export function RecipesPage() {
 
 	async function handleSave() {
 		if (!form.name.trim()) {
-			setFormError("Nome da receita é obrigatório.");
+			formDialog.setError("Nome da receita é obrigatório.");
 			return;
 		}
 
-		setSaving(true);
-		setFormError(null);
+		formDialog.setSaving(true);
+		formDialog.setError(null);
 
 		try {
 			const tags = form.tagsText
@@ -205,7 +188,7 @@ export function RecipesPage() {
 				}));
 
 			const payload: any = {
-				household_id: HOUSEHOLD_ID,
+				household_id: currentHousehold?.id,
 				name: form.name,
 				description: form.description || null,
 				instructions: null,
@@ -227,13 +210,13 @@ export function RecipesPage() {
 				});
 			}
 
-			setIsDialogOpen(false);
+			formDialog.close();
 			await loadRecipes();
 		} catch (err: any) {
 			console.error(err);
-			setFormError(err.message ?? "Erro ao salvar receita.");
+			formDialog.setError(err.message ?? "Erro ao salvar receita.");
 		} finally {
-			setSaving(false);
+			formDialog.setSaving(false);
 		}
 	}
 
@@ -252,43 +235,77 @@ export function RecipesPage() {
 	}
 
 	const filteredRecipes = useMemo(() => {
-		if (!selectedTag) return recipes;
-		return recipes.filter((r) => (r.tags ?? []).includes(selectedTag));
-	}, [recipes, selectedTag]);
+		return recipes;
+	}, [recipes]);
 
 	return (
-		<div className="space-y-4">
-			<RecipeFilters
-				search={search}
-				onSearchChange={setSearch}
-				tags={allTags}
-				selectedTag={selectedTag}
-				onTagChange={setSelectedTag}
-				onCreateClick={openCreateDialog}
+		<PageContainer>
+			<PageHeader
+				title="Receitas"
+				description="Gerencie as receitas da sua casa com ingredientes e tags."
+				action={
+					isOwner && (
+						<button
+							onClick={openCreateDialog}
+							className="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary/80  border border-transparent hover:border-gray-200 transition-colors duration-150"
+						>
+							+ Nova Receita
+						</button>
+					)
+				}
 			/>
 
-			<RecipesList
-				recipes={filteredRecipes}
-				loading={loading}
-				error={listError}
-				onEdit={openEditDialog}
-				onDelete={handleDelete}
-			/>
+			{listError && (
+				<ErrorMessage
+					message={listError}
+					onDismiss={() => setListError(null)}
+				/>
+			)}
+
+			{loading ? (
+				<LoadingState message="Carregando receitas..." />
+			) : filteredRecipes.length === 0 ? (
+				<EmptyState
+					title="Nenhuma receita encontrada"
+					description={
+						search
+							? "Tente ajustar sua busca."
+							: "Crie a primeira receita para começar."
+					}
+					action={
+						!search && isOwner && (
+							<Button onClick={openCreateDialog}>+ Nova Receita</Button>
+						)
+					}
+				/>
+			) : (
+				<RecipesList
+					recipes={filteredRecipes}
+					loading={false}
+					error={null}
+					onEdit={openEditDialog}
+					onDelete={handleDelete}
+					isOwner={isOwner}
+				/>
+			)}
 
 			<RecipeFormDialog
-				open={isDialogOpen}
-				onOpenChange={setIsDialogOpen}
+				open={formDialog.isOpen}
+				onOpenChange={(open) => {
+					if (!open) formDialog.close();
+					else formDialog.open();
+				}}
 				form={form}
 				onChangeField={handleChangeField}
 				onChangeIngredient={handleChangeIngredient}
 				onAddIngredient={addIngredientRow}
 				onRemoveIngredient={removeIngredientRow}
 				onSave={handleSave}
-				saving={saving}
-				error={formError}
+				saving={formDialog.isSaving}
+				error={formDialog.error}
 				ingredients={ingredients}
 				loadingIngredients={loadingIngredients}
 			/>
-		</div>
+		</PageContainer>
 	);
 }

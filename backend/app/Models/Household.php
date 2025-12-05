@@ -26,4 +26,8 @@ class Household extends Model {
 	public function pantryItems() {
 		return $this->hasMany(PantryItem::class);
 	}
+
+	public function mealTypes() {
+		return $this->hasMany(MealType::class)->orderBy('order');
+	}
 }

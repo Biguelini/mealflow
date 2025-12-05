@@ -15,6 +15,7 @@ type Props = {
 	error: string | null;
 	onEdit: (recipe: Recipe) => void;
 	onDelete: (recipe: Recipe) => void;
+	isOwner?: boolean;
 };
 
 export function RecipesList({
@@ -23,6 +24,7 @@ export function RecipesList({
 	error,
 	onEdit,
 	onDelete,
+	isOwner = true,
 }: Props) {
 	return (
 		<Card>
@@ -56,6 +58,7 @@ export function RecipesList({
 								recipe={recipe}
 								onEdit={onEdit}
 								onDelete={onDelete}
+								isOwner={isOwner}
 							/>
 						))}
 					</div>

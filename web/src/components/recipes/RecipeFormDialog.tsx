@@ -43,6 +43,11 @@ function IngredientRow({
 	onChange,
 	onRemove,
 }: IngredientRowProps) {
+	const selectedIngredient = ingredients.find(
+		(ing) => String(ing.id) === row.ingredientId
+	);
+	const displayUnit = selectedIngredient?.default_unit || "-";
+
 	return (
 		<div className="grid gap-2 px-3 py-2 sm:grid-cols-[minmax(0,2.2fr)_96px_96px_40px] sm:items-center">
 			<div>
@@ -60,6 +65,11 @@ function IngredientRow({
 						{ingredients.map((ing) => (
 							<SelectItem key={ing.id} value={String(ing.id)}>
 								{ing.name}
+								{ing.default_unit && (
+									<span className="text-muted-foreground ml-1">
+										({ing.default_unit})
+									</span>
+								)}
 							</SelectItem>
 						))}
 					</SelectContent>
@@ -83,19 +93,16 @@ function IngredientRow({
 				<span className="mb-1 block text-[11px] font-medium text-muted-foreground sm:hidden">
 					Unidade
 				</span>
-				<Input
-					value={row.unit}
-					onChange={(e) => onChange(index, "unit", e.target.value)}
-					placeholder="g, ml, un"
-					className="h-9 w-full"
-				/>
+				<div className="flex h-9 items-center justify-center rounded-md border border-input bg-muted/50 px-3 text-sm text-muted-foreground">
+					{displayUnit}
+				</div>
 			</div>
 
 			<div className="flex items-center justify-end">
 				<button
 					type="button"
 					onClick={() => onRemove(index)}
-					className="flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground hover:bg-muted"
+					className="flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground hover:bg-gray-50 dark:hover:bg-gray-900/50"
 				>
 					<X className="h-4 w-4" />
 				</button>
