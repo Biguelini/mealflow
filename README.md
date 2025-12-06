@@ -14,6 +14,7 @@
 ## 📋 Índice
 
 - [Visão Geral](#-visão-geral)
+- [Screenshots](#-screenshots)
 - [Funcionalidades](#-funcionalidades)
 - [Arquitetura](#-arquitetura)
 - [Tecnologias](#-tecnologias)
@@ -34,6 +35,48 @@ O MealFlow resolve o problema comum de "O que vamos comer hoje?" através de:
 - **Receitas Personalizadas**: Cadastre e organize suas receitas favoritas
 - **Listas de Compras Inteligentes**: Geração automática baseada no planejamento semanal
 - **Gestão de Família**: Compartilhe tudo com membros do seu household
+
+## 📸 Screenshots
+
+### Dashboard
+<p align="center">
+  <img src="preview/01-dashboard.png" alt="Dashboard" width="100%">
+</p>
+
+### Ingredientes
+<p align="center">
+  <img src="preview/02-ingredients.png" alt="Ingredientes" width="100%">
+</p>
+
+### Receitas
+<p align="center">
+  <img src="preview/03-recipes.png" alt="Receitas" width="100%">
+</p>
+
+### Despensa
+<p align="center">
+  <img src="preview/04-pantry.png" alt="Despensa" width="100%">
+</p>
+
+### Planejamento de Refeições
+<p align="center">
+  <img src="preview/05-meal-plan.png" alt="Planejamento de Refeições" width="100%">
+</p>
+
+### Listas de Compras
+<p align="center">
+  <img src="preview/06-shopping-lists.png" alt="Listas de Compras" width="100%">
+</p>
+
+### Configurações
+<p align="center">
+  <img src="preview/07-settings.png" alt="Configurações" width="100%">
+</p>
+
+### Dashboard (Tema Escuro)
+<p align="center">
+  <img src="preview/08-dashboard-dark.png" alt="Dashboard - Tema Escuro" width="100%">
+</p>
 
 ## ✨ Funcionalidades
 
