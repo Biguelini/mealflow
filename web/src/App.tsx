@@ -4,6 +4,7 @@ import { LoginPage } from "@/pages/auth/LoginPage";
 import { RegisterPage } from "@/pages/auth/RegisterPage";
 import { AuthProvider } from "@/context/AuthContext";
 import { HouseholdProvider } from "@/context/HouseholdContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { RecipesPage } from "./pages/app/RecipesPage";
 import { PantryPage } from "./pages/app/PantryPage";
@@ -15,15 +16,16 @@ import { SettingsPage } from "./pages/app/SettingsPage";
 
 export function App() {
   return (
-    <AuthProvider>
-      <HouseholdProvider>
-        <BrowserRouter>
+    <ThemeProvider>
+      <AuthProvider>
+        <HouseholdProvider>
+          <BrowserRouter>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
             <Route
-              path="/app"
+              path="/"
               element={
                 <PrivateRoute>
                   <AppLayout />
@@ -50,8 +52,9 @@ export function App() {
             <Route index element={<DashboardPage />} />
           </Route>
         </Routes>
-      </BrowserRouter>
-    </HouseholdProvider>
-    </AuthProvider>
+        </BrowserRouter>
+      </HouseholdProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

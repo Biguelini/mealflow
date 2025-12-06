@@ -52,7 +52,7 @@ export function RecipeCardItem({ recipe, onEdit, onDelete, isOwner = true }: Pro
 					<Button variant="ghost" size="icon" onClick={() => onEdit(recipe)}>
 						<Pencil className="h-4 w-4" />
 					</Button>
-					<Button variant="ghost" size="icon" onClick={() => onDelete(recipe)}>
+					<Button className="hover:text-destructive hover:bg-destructive/10 transition-colors" variant="ghost" size="icon" onClick={() => onDelete(recipe)}>
 						<Trash2 className="h-4 w-4 text-destructive" />
 					</Button>
 				</div>

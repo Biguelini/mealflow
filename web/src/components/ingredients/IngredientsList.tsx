@@ -90,7 +90,7 @@ export function IngredientList({
                 variant="outline"
                 size="sm"
                 onClick={() => onDelete(ingredient)}
-                className="flex-1 hover:bg-accent"
+                className="flex-1 hover:text-destructive hover:bg-destructive/10 transition-colors"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Deletar

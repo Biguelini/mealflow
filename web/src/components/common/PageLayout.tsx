@@ -10,16 +10,16 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, action }: PageHeaderProps) {
   return (
-    <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+    <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
       <div className="flex-1">
-        <h1 className="text-4xl font-extrabold text-foreground tracking-tight">
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">
           {title}
         </h1>
         {description && (
-          <p className="mt-3 text-lg text-muted-foreground leading-relaxed">{description}</p>
+          <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{description}</p>
         )}
       </div>
-      {action && <div className="flex items-center gap-3">{action}</div>}
+      {action && <div className="flex items-center gap-2">{action}</div>}
     </div>
   );
 }
@@ -29,7 +29,7 @@ interface PageContainerProps {
 }
 
 export function PageContainer({ children }: PageContainerProps) {
-  return <div className="space-y-6">{children}</div>;
+  return <div className="space-y-5 h-full flex flex-col">{children}</div>;
 }
 
 interface ErrorMessageProps {
@@ -39,13 +39,13 @@ interface ErrorMessageProps {
 
 export function ErrorMessage({ message, onDismiss }: ErrorMessageProps) {
   return (
-    <div className="rounded-xl border-2 border-destructive/20 bg-destructive/5 p-5 text-sm text-destructive shadow-sm">
+    <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
       <div className="flex items-start justify-between gap-3">
         <p className="font-medium leading-relaxed">{message}</p>
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="text-destructive/60 hover:text-destructive transition-colors rounded-lg p-1 hover:bg-destructive/10"
+            className="text-destructive/60 hover:text-destructive transition-colors rounded p-0.5 hover:bg-destructive/10"
           >
             ✕
           </button>
@@ -61,11 +61,11 @@ interface LoadingStateProps {
 
 export function LoadingState({ message = "Carregando..." }: LoadingStateProps) {
   return (
-    <Card className="shadow-card">
+    <Card>
       <CardContent className="pt-6">
-        <div className="flex items-center justify-center gap-3 py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <span className="text-base font-medium text-muted-foreground">{message}</span>
+        <div className="flex items-center justify-center gap-3 py-8">
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+          <span className="text-sm font-medium text-muted-foreground">{message}</span>
         </div>
       </CardContent>
     </Card>
@@ -86,14 +86,14 @@ export function EmptyState({
   icon,
 }: EmptyStateProps) {
   return (
-    <Card className="shadow-card border-2 border-dashed">
+    <Card className="border-dashed">
       <CardContent className="pt-6">
-        <div className="flex flex-col items-center justify-center gap-5 py-16 text-center">
-          {icon && <div className="text-5xl text-muted-foreground/60">{icon}</div>}
-          <div className="max-w-md">
-            <p className="text-lg font-bold text-foreground">{title}</p>
+        <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+          {icon && <div className="text-4xl text-muted-foreground/50">{icon}</div>}
+          <div className="max-w-sm">
+            <p className="text-base font-semibold text-foreground">{title}</p>
             {description && (
-              <p className="mt-2 text-base text-muted-foreground leading-relaxed">{description}</p>
+              <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{description}</p>
             )}
           </div>
           {action && <div className="mt-2">{action}</div>}

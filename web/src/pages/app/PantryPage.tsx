@@ -375,10 +375,10 @@ export function PantryPage() {
 														<Button
 															variant="ghost"
 															size="icon"
-															className="h-7 w-7"
+															className="h-7 w-7 hover:text-destructive hover:bg-destructive/10 transition-colors"
 															onClick={() => handleDelete(item)}
 														>
-															<Trash2 className="h-3 w-3 text-destructive" />
+															<Trash2 className="h-3 w-3  text-destructive" />
 														</Button>
 													</div>
 												)}

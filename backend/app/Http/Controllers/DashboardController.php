@@ -9,10 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    /**
-     * POST /dashboard/weekly-summary
-     * body: { household_id: int, week: "2025-W49" }
-     */
     public function weeklySummary(Request $request)
     {
         $user = $request->user();

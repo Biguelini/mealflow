@@ -277,7 +277,7 @@ export function MealPlanPage() {
 				<ErrorMessage message={error} onDismiss={() => setError(null)} />
 			)}
 
-			<Card className="flex flex-1 flex-col">
+			<Card className="flex flex-col">
 				<CardHeader className="border-b">
 					<CardTitle>Semana {weekLabel}</CardTitle>
 					<CardDescription>
@@ -288,25 +288,25 @@ export function MealPlanPage() {
 					</CardDescription>
 				</CardHeader>
 
-				<CardContent className="flex flex-1 flex-col gap-4 overflow-hidden pt-6">
+				<CardContent className="flex flex-col gap-4 overflow-hidden pt-6">
 					{(loadingPlan || loadingRecipes || loadingMealTypes) && (
 						<LoadingState message="Carregando dados da semana..." />
 					)}
 
 					{!loadingPlan && !loadingRecipes && !loadingMealTypes && (
 						<>
-							<div className="flex-1 overflow-x-auto rounded-lg border border-border bg-muted/20">
+							<div className=" overflow-auto rounded-lg border border-border">
 								<table className="w-full border-collapse">
-										<thead className="sticky top-0 z-10">
-											<tr className="bg-muted/60 hover:bg-gray-50 dark:hover:bg-gray-900/50">
-											<th className="sticky left-0 z-20 w-32 border-b border-r border-border bg-muted/60 px-4 py-3 text-left text-sm font-semibold text-foreground">
+										<thead className="sticky top-0 z-20">
+											<tr>
+											<th className="sticky left-0 z-30 w-32 border-b border-r border-border bg-muted px-4 py-3 text-left text-sm font-semibold text-foreground">
 												Refeição
 											</th>
 
 											{days.map((d) => (
 												<th
 													key={d.format("YYYY-MM-DD")}
-													className="border-b border-border px-3 py-3 text-center text-sm font-semibold text-foreground whitespace-nowrap min-w-[140px]"
+													className="border-b border-border bg-muted px-3 py-3 text-center text-sm font-semibold text-foreground whitespace-nowrap min-w-[140px]"
 												>
 													<div className="text-sm font-semibold">
 														{d.format("ddd")}
@@ -323,11 +323,13 @@ export function MealPlanPage() {
 									{mealTypes.map((mealType, mealIdx) => (
 										<tr
 											key={mealType.id}
-											className={`hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors ${
-												mealIdx % 2 === 0 ? "bg-background" : "bg-muted/5"
-											}`}
+											className={`transition-colors ${
+												mealIdx % 2 === 0 ? "bg-card" : "bg-muted/30"
+											} hover:bg-accent/30`}
 										>
-												<td className="sticky left-0 z-10 border-t border-r border-border bg-inherit px-4 py-4 text-sm font-semibold text-foreground whitespace-nowrap">
+												<td className={`sticky left-0 z-10 border-t border-r border-border px-4 py-4 text-sm font-semibold text-foreground whitespace-nowrap ${
+													mealIdx % 2 === 0 ? "bg-card" : "bg-muted"
+												}`}>
 													{mealType.name}
 												</td>
 
@@ -365,7 +367,7 @@ export function MealPlanPage() {
 																					}}
 																					className="text-destructive hover:text-destructive/80"
 																				>
-																					<Trash2 className="h-3 w-3" />
+																					<Trash2 className="h-3 w-3 " />
 																				</button>
 																			)}
 																		</div>
@@ -423,20 +425,20 @@ export function MealPlanPage() {
 							</div>
 
 							<div className="flex justify-end pt-2">
-							<button
+							<Button
 								onClick={handleSave}
 								disabled={!isOwner || saving || loadingPlan || loadingRecipes}
-								className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white hover:bg-primary/80  border border-transparent hover:border-gray-200 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary/80 disabled:hover:text-white min-w-[220px]"
+								className="min-w-[180px]"
 							>
 									{saving ? (
 										<>
-											<Loader2 className="mr-2 h-5 w-5 animate-spin" />
+											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
 											Salvando...
 										</>
 									) : (
 										"Salvar plano da semana"
 									)}
-								</button>
+								</Button>
 							</div>
 						</>
 					)}

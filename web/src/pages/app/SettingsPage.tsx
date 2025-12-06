@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/services/api";
 import { useHouseholdContext } from "@/context/HouseholdContext";
+import { useTheme } from "@/context/ThemeContext";
 import {
 	PageContainer,
 	PageHeader,
@@ -25,11 +26,12 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ChevronUp, ChevronDown } from "lucide-react";
+import { Plus, Pencil, Trash2, ChevronUp, ChevronDown, Sun, Moon, Monitor } from "lucide-react";
 import type { MealType, MealTypeFormState } from "@/types/mealTypes";
 
 export function SettingsPage() {
 	const { currentHousehold, isOwner } = useHouseholdContext();
+	const { theme, setTheme } = useTheme();
 	const [mealTypes, setMealTypes] = useState<MealType[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -199,6 +201,69 @@ export function SettingsPage() {
 
 			<Card className="mb-6">
 				<CardHeader className="border-b">
+					<CardTitle>Aparência</CardTitle>
+					<CardDescription>
+						Personalize a aparência do aplicativo
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="pt-6">
+					<div className="space-y-3">
+						<Label className="text-sm font-medium text-muted-foreground">Tema</Label>
+						<div className="grid grid-cols-3 gap-3">
+							<button
+								onClick={() => setTheme("light")}
+								className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all ${
+									theme === "light"
+										? "border-primary bg-primary/5"
+										: "border-border hover:border-primary/50 hover:bg-muted/50"
+								}`}
+							>
+								<Sun className={`h-6 w-6 ${theme === "light" ? "text-primary" : "text-muted-foreground"}`} />
+								<span className={`text-sm font-medium ${theme === "light" ? "text-primary" : "text-foreground"}`}>
+									Claro
+								</span>
+							</button>
+							<button
+								onClick={() => setTheme("dark")}
+								className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all ${
+									theme === "dark"
+										? "border-primary bg-primary/5"
+										: "border-border hover:border-primary/50 hover:bg-muted/50"
+								}`}
+							>
+								<Moon className={`h-6 w-6 ${theme === "dark" ? "text-primary" : "text-muted-foreground"}`} />
+								<span className={`text-sm font-medium ${theme === "dark" ? "text-primary" : "text-foreground"}`}>
+									Escuro
+								</span>
+							</button>
+							<button
+								onClick={() => setTheme("system")}
+								className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all ${
+									theme === "system"
+										? "border-primary bg-primary/5"
+										: "border-border hover:border-primary/50 hover:bg-muted/50"
+								}`}
+							>
+								<Monitor className={`h-6 w-6 ${theme === "system" ? "text-primary" : "text-muted-foreground"}`} />
+								<span className={`text-sm font-medium ${theme === "system" ? "text-primary" : "text-foreground"}`}>
+									Sistema
+								</span>
+							</button>
+						</div>
+						<p className="text-xs text-muted-foreground">
+							{theme === "system" 
+								? "O tema será ajustado automaticamente de acordo com as preferências do seu sistema operacional."
+								: theme === "dark"
+								? "O tema escuro está ativo. Ideal para ambientes com pouca luz."
+								: "O tema claro está ativo. Ideal para ambientes bem iluminados."
+							}
+						</p>
+					</div>
+				</CardContent>
+			</Card>
+
+			<Card className="mb-6">
+				<CardHeader className="border-b">
 					<CardTitle>Informações da Household</CardTitle>
 					<CardDescription>
 						Detalhes sobre sua household atual
@@ -311,6 +376,7 @@ export function SettingsPage() {
 												variant="ghost"
 												size="icon"
 												onClick={() => handleDelete(mealType)}
+												className="hover:text-destructive hover:bg-destructive/10 transition-colors"
 											>
 												<Trash2 className="h-4 w-4 text-destructive" />
 											</Button>
