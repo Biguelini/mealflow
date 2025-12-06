@@ -49,7 +49,7 @@ function IngredientRow({
 	const displayUnit = selectedIngredient?.default_unit || "-";
 
 	return (
-		<div className="grid gap-2 px-3 py-2 sm:grid-cols-[minmax(0,2.2fr)_96px_96px_40px] sm:items-center">
+		<div className="grid gap-2 px-3 py-2 sm:grid-cols-[minmax(0,2.2fr)_80px_80px_40px] sm:items-center">
 			<div>
 				<span className="mb-1 block text-[11px] font-medium text-muted-foreground sm:hidden">
 					Ingrediente
@@ -58,8 +58,8 @@ function IngredientRow({
 					value={row.ingredientId}
 					onValueChange={(value) => onChange(index, "ingredientId", value)}
 				>
-					<SelectTrigger className="h-9 w-full overflow-hidden text-ellipsis whitespace-nowrap">
-						<SelectValue placeholder="Selecione um ingrediente" />
+					<SelectTrigger className="h-9 w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm">
+						<SelectValue placeholder="Selecione..." />
 					</SelectTrigger>
 					<SelectContent>
 						{ingredients.map((ing) => (
@@ -85,7 +85,7 @@ function IngredientRow({
 					onChange={(e) => onChange(index, "quantity", e.target.value)}
 					inputMode="decimal"
 					placeholder="ex: 250"
-					className="h-9 w-full"
+					className="h-9 w-full text-sm"
 				/>
 			</div>
 
@@ -93,12 +93,12 @@ function IngredientRow({
 				<span className="mb-1 block text-[11px] font-medium text-muted-foreground sm:hidden">
 					Unidade
 				</span>
-				<div className="flex h-9 items-center justify-center rounded-md border border-input bg-muted/50 px-3 text-sm text-muted-foreground">
+				<div className="flex h-9 items-center justify-center rounded-md border border-input bg-muted/50 px-2 text-sm text-muted-foreground">
 					{displayUnit}
 				</div>
 			</div>
 
-			<div className="flex items-center justify-end">
+			<div className="flex items-center justify-end sm:justify-center">
 				<button
 					type="button"
 					onClick={() => onRemove(index)}
@@ -151,7 +151,7 @@ export function RecipeFormDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="flex max-h-[90vh] max-w-2xl flex-col">
+			<DialogContent className="flex max-h-[90vh] w-[95vw] max-w-2xl flex-col">
 				<DialogHeader>
 					<DialogTitle>
 						{isEditing ? "Editar receita" : "Nova receita"}
@@ -231,7 +231,7 @@ export function RecipeFormDialog({
 								)}
 
 								<div className="rounded-lg border border-border bg-muted/10">
-									<div className="hidden grid-cols-[minmax(0,2.2fr)_96px_96px_40px] items-center gap-2 border-b px-3 py-2 text-[11px] font-medium text-muted-foreground sm:grid">
+									<div className="hidden sm:grid grid-cols-[minmax(0,2.2fr)_80px_80px_40px] items-center gap-2 border-b px-3 py-2 text-[11px] font-medium text-muted-foreground">
 										<span>Ingrediente</span>
 										<span>Quantidade</span>
 										<span>Unidade</span>
@@ -256,15 +256,16 @@ export function RecipeFormDialog({
 					</div>
 				</div>
 
-				<DialogFooter>
+				<DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
 					<Button
 						type="button"
 						variant="outline"
 						onClick={() => onOpenChange(false)}
+						className="w-full sm:w-auto"
 					>
 						Cancelar
 					</Button>
-					<Button type="button" onClick={onSave} disabled={saving}>
+					<Button type="button" onClick={onSave} disabled={saving} className="w-full sm:w-auto">
 						{saving ? "Salvando..." : "Salvar receita"}
 					</Button>
 				</DialogFooter>

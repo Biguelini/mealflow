@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useHouseholdContext } from "@/context/HouseholdContext";
@@ -11,6 +12,8 @@ import {
 	Settings,
 	LogOut,
 	ChevronDown,
+	Menu,
+	X,
 } from "lucide-react";
 
 type NavItem = {
@@ -32,26 +35,51 @@ const navItems: NavItem[] = [
 export function AppLayout() {
 	const { user, logout } = useAuth();
 	const { currentHousehold, households, setCurrentHousehold, loading, isOwner } = useHouseholdContext();
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	return (
 		<div className="flex h-full overflow-hidden bg-background text-foreground">
-			<aside className="hidden md:flex md:w-64 md:flex-col border-r border-border bg-card">
-				<div className="flex h-16 items-center gap-3 border-b border-border px-5">
-					<div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-sm">
-						<svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-						</svg>
+			{mobileMenuOpen && (
+				<div
+					className="fixed inset-0 z-40 bg-black/50 md:hidden"
+					onClick={() => setMobileMenuOpen(false)}
+				/>
+			)}
+
+			<aside className={`
+				fixed inset-y-0 left-0 z-50 w-72 flex-col border-r border-border bg-card transition-transform duration-300 ease-in-out
+				md:static md:w-64 md:translate-x-0 md:flex
+				${mobileMenuOpen ? 'flex translate-x-0' : '-translate-x-full'}
+			`}>
+				<div className="flex h-16 items-center justify-between gap-3 border-b border-border px-5">
+					<div className="flex items-center gap-3">
+						<div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center shadow-sm">
+							<svg className="w-6 h-6 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+							</svg>
+						</div>
+						<div>
+							<div className="text-lg font-bold text-foreground">MealFlow</div>
+							<div className="text-xs text-muted-foreground">Planeje suas refeições</div>
+						</div>
 					</div>
-					<div>
-						<div className="text-lg font-bold text-foreground">MealFlow</div>
-						<div className="text-xs text-muted-foreground">Planeje suas refeições</div>
-					</div>
+
+					<button
+						onClick={() => setMobileMenuOpen(false)}
+						className="md:hidden h-9 w-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors"
+					>
+						<X className="h-5 w-5" />
+					</button>
 				</div>
 
 				<nav className="flex-1 overflow-y-auto px-3 py-4">
 					<div className="space-y-1">
 						{navItems.map((item) => (
-							<SidebarLink key={item.to} item={item} />
+							<SidebarLink
+								key={item.to}
+								item={item}
+								onClick={() => setMobileMenuOpen(false)}
+							/>
 						))}
 					</div>
 				</nav>
@@ -95,30 +123,37 @@ export function AppLayout() {
 			</aside>
 
 			<div className="flex flex-1 flex-col overflow-hidden">
-				<header className="flex h-16 items-center justify-between border-b border-border bg-card px-6 shrink-0">
+				<header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 sm:px-6 shrink-0">
 					<div className="flex items-center gap-3">
-						<div className="md:hidden">
-							<div className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors cursor-pointer">
-								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+						<button
+							onClick={() => setMobileMenuOpen(true)}
+							className="md:hidden h-9 w-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors"
+						>
+							<Menu className="h-5 w-5" />
+						</button>
+
+						<div className="md:hidden flex items-center gap-2">
+							<div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+								<svg className="w-5 h-5 text-primary-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
 								</svg>
 							</div>
+							<span className="font-bold text-foreground">MealFlow</span>
 						</div>
-						
 					</div>
 
-					<div className="flex items-center gap-3">
+					<div className="flex items-center gap-2 sm:gap-3">
 						<div className="flex items-center gap-2">
 							<div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
 								{user?.name?.[0]?.toUpperCase() ?? "U"}
 							</div>
-							<span className="hidden md:inline text-sm font-medium text-foreground">
+							<span className="hidden sm:inline text-sm font-medium text-foreground">
 								{user?.name ?? "Usuário"}
 							</span>
 						</div>
 						<button
 							onClick={logout}
-							className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+							className="flex items-center gap-2 rounded-lg px-2 sm:px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
 							title="Sair"
 						>
 							<LogOut className="h-4 w-4" />
@@ -128,7 +163,7 @@ export function AppLayout() {
 				</header>
 
 				<main className="flex-1 overflow-auto bg-muted/30">
-					<div className="min-h-full px-16 pt-8 pb-16">
+					<div className="min-h-full px-4 sm:px-6 lg:px-16 pt-6 sm:pt-8 pb-12 sm:pb-16">
 						<div className="mx-auto max-w-7xl">
 							<Outlet />
 						</div>
@@ -139,13 +174,14 @@ export function AppLayout() {
 	);
 }
 
-function SidebarLink({ item }: { item: NavItem }) {
+function SidebarLink({ item, onClick }: { item: NavItem; onClick?: () => void }) {
 	const Icon = item.icon;
 
 	return (
 		<NavLink
 			to={item.to}
 			end={item.to === "/"}
+			onClick={onClick}
 			className={({ isActive }) =>
 				[
 					"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150",

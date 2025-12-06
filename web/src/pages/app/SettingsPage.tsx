@@ -209,43 +209,43 @@ export function SettingsPage() {
 				<CardContent className="pt-6">
 					<div className="space-y-3">
 						<Label className="text-sm font-medium text-muted-foreground">Tema</Label>
-						<div className="grid grid-cols-3 gap-3">
+						<div className="grid grid-cols-3 gap-2 sm:gap-3">
 							<button
 								onClick={() => setTheme("light")}
-								className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all ${
+								className={`flex flex-col items-center gap-1.5 sm:gap-2 rounded-lg border-2 p-3 sm:p-4 transition-all ${
 									theme === "light"
 										? "border-primary bg-primary/5"
 										: "border-border hover:border-primary/50 hover:bg-muted/50"
 								}`}
 							>
-								<Sun className={`h-6 w-6 ${theme === "light" ? "text-primary" : "text-muted-foreground"}`} />
-								<span className={`text-sm font-medium ${theme === "light" ? "text-primary" : "text-foreground"}`}>
+								<Sun className={`h-5 w-5 sm:h-6 sm:w-6 ${theme === "light" ? "text-primary" : "text-muted-foreground"}`} />
+								<span className={`text-xs sm:text-sm font-medium ${theme === "light" ? "text-primary" : "text-foreground"}`}>
 									Claro
 								</span>
 							</button>
 							<button
 								onClick={() => setTheme("dark")}
-								className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all ${
+								className={`flex flex-col items-center gap-1.5 sm:gap-2 rounded-lg border-2 p-3 sm:p-4 transition-all ${
 									theme === "dark"
 										? "border-primary bg-primary/5"
 										: "border-border hover:border-primary/50 hover:bg-muted/50"
 								}`}
 							>
-								<Moon className={`h-6 w-6 ${theme === "dark" ? "text-primary" : "text-muted-foreground"}`} />
-								<span className={`text-sm font-medium ${theme === "dark" ? "text-primary" : "text-foreground"}`}>
+								<Moon className={`h-5 w-5 sm:h-6 sm:w-6 ${theme === "dark" ? "text-primary" : "text-muted-foreground"}`} />
+								<span className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-primary" : "text-foreground"}`}>
 									Escuro
 								</span>
 							</button>
 							<button
 								onClick={() => setTheme("system")}
-								className={`flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all ${
+								className={`flex flex-col items-center gap-1.5 sm:gap-2 rounded-lg border-2 p-3 sm:p-4 transition-all ${
 									theme === "system"
 										? "border-primary bg-primary/5"
 										: "border-border hover:border-primary/50 hover:bg-muted/50"
 								}`}
 							>
-								<Monitor className={`h-6 w-6 ${theme === "system" ? "text-primary" : "text-muted-foreground"}`} />
-								<span className={`text-sm font-medium ${theme === "system" ? "text-primary" : "text-foreground"}`}>
+								<Monitor className={`h-5 w-5 sm:h-6 sm:w-6 ${theme === "system" ? "text-primary" : "text-muted-foreground"}`} />
+								<span className={`text-xs sm:text-sm font-medium ${theme === "system" ? "text-primary" : "text-foreground"}`}>
 									Sistema
 								</span>
 							</button>
@@ -295,7 +295,7 @@ export function SettingsPage() {
 
 			<Card>
 				<CardHeader className="border-b">
-					<div className="flex items-center justify-between">
+					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<div>
 							<CardTitle>Tipos de Refeições</CardTitle>
 							<CardDescription>
@@ -331,10 +331,10 @@ export function SettingsPage() {
 							{mealTypes.map((mealType, index) => (
 								<div
 									key={mealType.id}
-									className="flex items-center gap-3 rounded-md border border-border px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
+									className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-md border border-border px-3 sm:px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
 								>
 									{isOwner && (
-										<div className="flex flex-col">
+										<div className="hidden sm:flex flex-col">
 											<Button
 												variant="ghost"
 												size="icon"
@@ -364,7 +364,27 @@ export function SettingsPage() {
 									</div>
 
 									{isOwner && (
-										<div className="flex items-center gap-1">
+										<div className="flex items-center gap-1 justify-end">
+											<div className="flex sm:hidden items-center gap-1 mr-2">
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-8 w-8"
+													onClick={() => handleReorder(mealType, "up")}
+													disabled={index === 0}
+												>
+													<ChevronUp className="h-4 w-4" />
+												</Button>
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-8 w-8"
+													onClick={() => handleReorder(mealType, "down")}
+													disabled={index === mealTypes.length - 1}
+												>
+													<ChevronDown className="h-4 w-4" />
+												</Button>
+											</div>
 											<Button
 												variant="ghost"
 												size="icon"

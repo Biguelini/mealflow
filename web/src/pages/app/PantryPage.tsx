@@ -270,14 +270,14 @@ export function PantryPage() {
 
 			<Card>
 				<CardHeader className="border-b">
-					<div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<div>
 							<CardTitle>Meus itens</CardTitle>
 							<CardDescription>Gerencie os itens da sua despensa</CardDescription>
 						</div>
 						<Input
 							placeholder="Buscar na despensa..."
-							className="max-w-xs"
+							className="sm:max-w-xs"
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
 						/>
@@ -292,20 +292,108 @@ export function PantryPage() {
 							Nenhum item na despensa. Adicione o primeiro item.
 						</p>
 					) : (
-						<div className="space-y-2">
-							<div className="hidden md:grid grid-cols-[40%_10%_10%_20%_20%] rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
-								<span>Ingrediente</span>
-								<span className="text-right">Quantidade</span>
-								<span className="text-right">Unidade</span>
-								<span className="text-right">Validade</span>
-								<span className="text-right">Status</span>
+						<>
+							<div className="hidden md:block space-y-2">
+								<div className="grid grid-cols-[40%_10%_10%_20%_20%] rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
+									<span>Ingrediente</span>
+									<span className="text-right">Quantidade</span>
+									<span className="text-right">Unidade</span>
+									<span className="text-right">Validade</span>
+									<span className="text-right">Status</span>
+								</div>
+
+								<div className="space-y-2">
+									{filteredItems.map((item) => {
+										const status = computeStatus(item.expires_at);
+
+										const rowClasses =
+											status.variant === "expired"
+												? "border-destructive/50 bg-destructive/5"
+												: status.variant === "near"
+													? "border-amber-400/60 bg-amber-50 dark:bg-amber-900/20"
+													: "border-border";
+
+										const badgeClasses =
+											status.variant === "expired"
+												? "bg-destructive/10 text-destructive border-destructive/40"
+												: status.variant === "near"
+													? "bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200 border-amber-300/60"
+													: status.variant === "no-date"
+														? "bg-muted text-muted-foreground border-border/60"
+														: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200 border-emerald-300/60";
+
+										return (
+											<div
+												key={item.id}
+												className={`grid grid-cols-[40%_10%_10%_20%_20%] rounded-md border px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors ${rowClasses}`}
+											>
+												<div>
+													<div className="font-medium min-w-0">
+														{item.ingredient.name}
+													</div>
+													{item.notes && (
+														<div className="text-[11px] text-muted-foreground">
+															{item.notes}
+														</div>
+													)}
+												</div>
+
+												<div className="text-right">
+													{Number(item.quantity).toLocaleString("pt-BR", {
+														minimumFractionDigits: 0,
+														maximumFractionDigits: 2,
+													})}
+												</div>
+
+												<div className="text-right">
+													{item.unit || item.ingredient.default_unit || "-"}
+												</div>
+
+												<div className="text-right text-xs">
+													{item.expires_at
+														? moment(item.expires_at).format("DD/MM/YYYY")
+														: "—"}
+												</div>
+
+												<div className="flex items-center justify-end gap-2">
+													<span
+														className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] ${badgeClasses}`}
+													>
+														{status.label}
+													</span>
+
+													{isOwner && (
+														<div className="flex items-center gap-1">
+															<Button
+																variant="ghost"
+																size="icon"
+																className="h-7 w-7"
+																onClick={() => openEditDialog(item)}
+															>
+																<Pencil className="h-3 w-3" />
+															</Button>
+															<Button
+																variant="ghost"
+																size="icon"
+																className="h-7 w-7 hover:text-destructive hover:bg-destructive/10 transition-colors"
+																onClick={() => handleDelete(item)}
+															>
+																<Trash2 className="h-3 w-3 text-destructive" />
+															</Button>
+														</div>
+													)}
+												</div>
+											</div>
+										);
+									})}
+								</div>
 							</div>
 
-							<div className="space-y-2">
+							<div className="md:hidden space-y-3">
 								{filteredItems.map((item) => {
 									const status = computeStatus(item.expires_at);
 
-									const rowClasses =
+									const cardClasses =
 										status.variant === "expired"
 											? "border-destructive/50 bg-destructive/5"
 											: status.variant === "near"
@@ -322,88 +410,95 @@ export function PantryPage() {
 													: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-200 border-emerald-300/60";
 
 									return (
-											<div
-												key={item.id}
-												className={`grid grid-cols-[40%_10%_10%_20%_20%] rounded-md border px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors ${rowClasses}`}
-
-											>
-											<div>
-												<div className="font-medium min-w-0">
-													{item.ingredient.name}
-												</div>
-												{item.notes && (
-													<div className="text-[11px] text-muted-foreground">
-														{item.notes}
+										<div
+											key={item.id}
+											className={`rounded-lg border p-4 ${cardClasses}`}
+										>
+											<div className="flex items-start justify-between gap-3">
+												<div className="flex-1 min-w-0">
+													<div className="font-medium text-sm">
+														{item.ingredient.name}
 													</div>
-												)}
-											</div>
-
-											<div className="md:text-right">
-												{Number(item.quantity).toLocaleString("pt-BR", {
-													minimumFractionDigits: 0,
-													maximumFractionDigits: 2,
-												})}
-											</div>
-
-											<div className="md:text-right">
-												{item.unit || item.ingredient.default_unit || "-"}
-											</div>
-
-											<div className="md:text-right text-xs">
-												{item.expires_at
-													? moment(item.expires_at).format("DD/MM/YYYY")
-													: "—"}
-											</div>
-
-											<div className="flex items-center justify-between gap-2 md:justify-end">
+													{item.notes && (
+														<div className="text-xs text-muted-foreground mt-0.5">
+															{item.notes}
+														</div>
+													)}
+												</div>
 												<span
-													className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] ${badgeClasses}`}
+													className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] shrink-0 ${badgeClasses}`}
 												>
 													{status.label}
 												</span>
-
-												{isOwner && (
-													<div className="flex items-center gap-1">
-														<Button
-															variant="ghost"
-															size="icon"
-															className="h-7 w-7"
-															onClick={() => openEditDialog(item)}
-														>
-															<Pencil className="h-3 w-3" />
-														</Button>
-														<Button
-															variant="ghost"
-															size="icon"
-															className="h-7 w-7 hover:text-destructive hover:bg-destructive/10 transition-colors"
-															onClick={() => handleDelete(item)}
-														>
-															<Trash2 className="h-3 w-3  text-destructive" />
-														</Button>
-													</div>
-												)}
 											</div>
+
+											<div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+												<div>
+													<div className="text-muted-foreground">Qtd.</div>
+													<div className="font-medium">
+														{Number(item.quantity).toLocaleString("pt-BR", {
+															minimumFractionDigits: 0,
+															maximumFractionDigits: 2,
+														})}
+													</div>
+												</div>
+												<div>
+													<div className="text-muted-foreground">Unidade</div>
+													<div className="font-medium">
+														{item.unit || item.ingredient.default_unit || "-"}
+													</div>
+												</div>
+												<div>
+													<div className="text-muted-foreground">Validade</div>
+													<div className="font-medium">
+														{item.expires_at
+															? moment(item.expires_at).format("DD/MM/YY")
+															: "—"}
+													</div>
+												</div>
+											</div>
+
+											{isOwner && (
+												<div className="mt-3 pt-3 border-t border-border/50 flex items-center gap-2">
+													<Button
+														variant="outline"
+														size="sm"
+														className="flex-1 h-9"
+														onClick={() => openEditDialog(item)}
+													>
+														<Pencil className="h-3.5 w-3.5 mr-1.5" />
+														Editar
+													</Button>
+													<Button
+														variant="outline"
+														size="sm"
+														className="flex-1 h-9 hover:text-destructive hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
+														onClick={() => handleDelete(item)}
+													>
+														<Trash2 className="h-3.5 w-3.5 mr-1.5 text-destructive" />
+														Remover
+													</Button>
+												</div>
+											)}
 										</div>
 									);
 								})}
 							</div>
-						</div>
+						</>
 					)}
 				</CardContent>
 			</Card>
 
-			<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-				<DialogContent className="max-w-lg">
-					<DialogHeader>
-						<DialogTitle>
-							{form.id ? "Editar item da despensa" : "Adicionar item na despensa"}
-						</DialogTitle>
-						<DialogDescription>
-							Selecione um ingrediente e preencha a quantidade e validade.
-						</DialogDescription>
-					</DialogHeader>
-
-					<div className="space-y-4">
+		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+			<DialogContent className="w-[95vw] max-w-lg">
+				<DialogHeader>
+					<DialogTitle>
+						{form.id ? "Editar item da despensa" : "Adicionar item na despensa"}
+					</DialogTitle>
+					<DialogDescription>
+						Selecione um ingrediente e preencha a quantidade e validade.
+					</DialogDescription>
+				</DialogHeader>					<div className="space-y-4">
 						<div className="space-y-2 w-full">
 							<Label>Ingrediente</Label>
 							<Select

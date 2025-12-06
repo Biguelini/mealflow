@@ -7,19 +7,15 @@ import { PageHeader, PageContainer, ErrorMessage, LoadingState } from "@/compone
 import { Button } from "@/components/ui/button";
 import {
 	Card,
-	CardHeader,
-	CardTitle,
-	CardDescription,
 	CardContent,
 } from "@/components/ui/card";
 import {
 	Select,
 	SelectTrigger,
-	SelectValue,
 	SelectContent,
 	SelectItem,
 } from "@/components/ui/select";
-import { Loader2, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, X, Plus, CalendarDays } from "lucide-react";
 
 type Recipe = {
 	id: number;
@@ -48,6 +44,8 @@ type MealPlan = {
 type CellMap = Record<string, number[]>;
 
 const makeKey = (dateStr: string, mealTypeId: number) => `${dateStr}::${mealTypeId}`;
+
+const dayNames = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
 export function MealPlanPage() {
 	const { currentHousehold, isOwner } = useHouseholdContext();
@@ -81,9 +79,12 @@ export function MealPlanPage() {
 
 	const weekRangeLabel = useMemo(() => {
 		const end = moment(weekStart).add(6, "day");
-		return `${weekStart.format("DD [de] MMM.")} – ${end.format(
-			"DD [de] MMM."
-		)}`;
+		return `${weekStart.format("DD MMM")} – ${end.format("DD MMM")}`;
+	}, [weekStart]);
+
+	const isCurrentWeek = useMemo(() => {
+		const now = moment().startOf("isoWeek");
+		return weekStart.isSame(now, "day");
 	}, [weekStart]);
 
 	async function loadRecipes() {
@@ -131,19 +132,19 @@ export function MealPlanPage() {
 
 			setMealPlanId(data.id);
 			const nextCells: CellMap = {};
-			
+
 
 			data.items.forEach((item) => {
 				const dateStr = item.date.split("T")[0];
 				const mealTypeId = item.meal_type_id || 0;
 				const key = makeKey(dateStr, mealTypeId);
-				
+
 				if (!nextCells[key]) {
 					nextCells[key] = [];
 				}
 				nextCells[key].push(item.recipe_id);
 			});
-			
+
 			setCells(nextCells);
 		} catch (err: any) {
 			const message = err?.message ?? "";
@@ -187,6 +188,10 @@ export function MealPlanPage() {
 		setWeekStart((prev) => moment(prev).add(delta, "week").startOf("isoWeek"));
 	}
 
+	function goToCurrentWeek() {
+		setWeekStart(moment().startOf("isoWeek"));
+	}
+
 	async function handleSave() {
 		setSaving(true);
 		setError(null);
@@ -204,12 +209,12 @@ export function MealPlanPage() {
 				if (!recipeIds || recipeIds.length === 0) return;
 				const [date, mealTypeIdStr] = key.split("::");
 				const mealTypeId = Number(mealTypeIdStr);
-				
+
 				recipeIds.forEach(recipeId => {
-					itemsPayload.push({ 
-						date, 
-						meal_type_id: mealTypeId, 
-						recipe_id: recipeId 
+					itemsPayload.push({
+						date,
+						meal_type_id: mealTypeId,
+						recipe_id: recipeId
 					});
 				});
 			});
@@ -221,7 +226,7 @@ export function MealPlanPage() {
 				notes: null,
 				items: itemsPayload,
 			};
-			
+
 			if (mealPlanId) {
 				await apiFetch(`/meal-plans/${mealPlanId}`, {
 					method: "PUT",
@@ -242,34 +247,173 @@ export function MealPlanPage() {
 		}
 	}
 
+	const isLoading = loadingPlan || loadingRecipes || loadingMealTypes;
+
+	function DayCard({ day, dayIdx, compact = false }: { day: Moment; dayIdx: number; compact?: boolean }) {
+		const isToday = day.isSame(moment(), "day");
+		const dateStr = day.format("YYYY-MM-DD");
+
+		return (
+			<div className="flex flex-col">
+				<div className={`text-center py-2 px-2 rounded-t-lg border border-b-0 ${isToday
+					? "bg-primary text-primary-foreground border-primary"
+					: "bg-muted border-border"
+					}`}>
+					<div className={`font-medium ${compact ? "text-sm" : "text-xs opacity-80"}`}>
+						{compact ? `${dayNames[dayIdx]}, ` : dayNames[dayIdx]}
+						<span className={compact ? "font-bold" : ""}>{day.format("DD/MM")}</span>
+					</div>
+					{!compact && (
+						<div className={`text-lg font-bold ${isToday ? "" : "text-foreground"}`}>
+							{day.format("DD")}
+						</div>
+					)}
+				</div>
+
+				<Card className={`flex-1 rounded-t-none border-t-0 ${isToday ? "border-primary/50" : ""}`}>
+					<CardContent className={`space-y-3 ${compact ? "p-3" : "p-2 space-y-2"}`}>
+						{mealTypes.map((mealType) => {
+							const key = makeKey(dateStr, mealType.id);
+							const recipeIds = cells[key] || [];
+
+							return (
+								<div key={mealType.id} className="space-y-1.5">
+									<div className={`font-semibold text-muted-foreground uppercase tracking-wide ${compact ? "text-xs" : "text-[10px]"
+										}`}>
+										{mealType.name}
+									</div>
+
+									<div className="space-y-1.5">
+										{recipeIds.map((recipeId, idx) => {
+											const recipe = recipes.find((r) => r.id === recipeId);
+											return (
+												<div
+													key={idx}
+													className={`group flex items-center gap-2 bg-primary/10 text-primary rounded-md ${compact ? "px-3 py-2 text-sm" : "px-2 py-1.5 text-xs"
+														}`}
+												>
+													<span className="flex-1 truncate font-medium">
+														{recipe?.name || "?"}
+													</span>
+													{isOwner && (
+														<button
+															onClick={() => {
+																const newIds = recipeIds.filter((_, i) => i !== idx);
+																handleChangeCell(day, mealType.id, newIds);
+															}}
+															className="opacity-60 hover:opacity-100 text-primary/60 hover:text-destructive transition-opacity"
+														>
+															<X className={compact ? "h-4 w-4" : "h-3 w-3"} />
+														</button>
+													)}
+												</div>
+											);
+										})}
+
+										{isOwner && (
+											<Select
+												value=""
+												onValueChange={(recipeIdStr) => {
+													const recipeId = Number(recipeIdStr);
+													if (recipeId > 0) {
+														handleChangeCell(day, mealType.id, [...recipeIds, recipeId]);
+													}
+												}}
+											>
+												<SelectTrigger className={`w-full border-dashed bg-transparent hover:bg-muted/50 ${compact ? "h-9 text-sm" : "h-7 text-[10px]"
+													}`}>
+													<Plus className={compact ? "h-4 w-4 mr-1.5" : "h-3 w-3 mr-1"} />
+													<span className="text-muted-foreground">Adicionar</span>
+												</SelectTrigger>
+												<SelectContent>
+													{recipes.length === 0 ? (
+														<SelectItem
+															disabled
+															value="__none__"
+															className="text-sm text-muted-foreground"
+														>
+															Nenhuma receita
+														</SelectItem>
+													) : (
+														recipes
+															.filter((r) => !recipeIds.includes(r.id))
+															.map((r) => (
+																<SelectItem
+																	key={r.id}
+																	value={String(r.id)}
+																	className="text-sm"
+																>
+																	{r.name}
+																</SelectItem>
+															))
+													)}
+												</SelectContent>
+											</Select>
+										)}
+
+										{!isOwner && recipeIds.length === 0 && (
+											<div className={`text-muted-foreground/50 text-center py-2 ${compact ? "text-sm" : "text-[10px]"
+												}`}>
+												Nenhuma receita
+											</div>
+										)}
+									</div>
+								</div>
+							);
+						})}
+
+						{mealTypes.length === 0 && (
+							<div className="text-sm text-muted-foreground text-center py-4">
+								Configure os tipos de refeição nas configurações
+							</div>
+						)}
+					</CardContent>
+				</Card>
+			</div>
+		);
+	}
+
 	return (
 		<PageContainer>
-			<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<PageHeader
 					title="Plano Semanal"
-					description="Defina as receitas de cada refeição para a semana."
+					description="Organize suas refeições da semana"
 				/>
 
-				<div className="flex items-center justify-center gap-3 rounded-lg border border-border bg-card px-4 py-2">
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={() => goToOtherWeek(-1)}
-						className="h-8 w-8"
-					>
-						<ChevronLeft className="h-5 w-5" />
-					</Button>
-					<div className="min-w-[200px] text-center text-sm font-semibold">
-						{weekRangeLabel}
+				<div className="flex items-center gap-2 justify-center">
+					{!isCurrentWeek && (
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={goToCurrentWeek}
+							className="text-xs"
+						>
+							<CalendarDays className="mr-1.5 h-3.5 w-3.5" />
+							Hoje
+						</Button>
+					)}
+					<div className="flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 sm:justify-start">
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={() => goToOtherWeek(-1)}
+							className="h-8 w-8"
+						>
+							<ChevronLeft className="h-5 w-5" />
+						</Button>
+						<div className="min-w-[140px] sm:min-w-[200px] text-center text-sm font-semibold">
+							{weekRangeLabel}
+						</div>
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={() => goToOtherWeek(1)}
+							className="h-8 w-8"
+						>
+							<ChevronRight className="h-5 w-5" />
+						</Button>
 					</div>
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={() => goToOtherWeek(1)}
-						className="h-8 w-8"
-					>
-						<ChevronRight className="h-5 w-5" />
-					</Button>
 				</div>
 			</div>
 
@@ -277,173 +421,43 @@ export function MealPlanPage() {
 				<ErrorMessage message={error} onDismiss={() => setError(null)} />
 			)}
 
-			<Card className="flex flex-col">
-				<CardHeader className="border-b">
-					<CardTitle>Semana {weekLabel}</CardTitle>
-					<CardDescription>
-						{isOwner 
-							? "Adicione múltiplas receitas para cada refeição. Clique em '+ Adicionar' para incluir mais pratos."
-							: "Visualize o plano de refeições da semana."
-						}
-					</CardDescription>
-				</CardHeader>
+			{isLoading ? (
+				<LoadingState message="Carregando plano da semana..." />
+			) : (
+				<>
+					<div className="lg:hidden space-y-4">
+						{days.map((day, dayIdx) => (
+							<DayCard key={day.format("YYYY-MM-DD")} day={day} dayIdx={dayIdx} compact={true} />
+						))}
+					</div>
 
-				<CardContent className="flex flex-col gap-4 overflow-hidden pt-6">
-					{(loadingPlan || loadingRecipes || loadingMealTypes) && (
-						<LoadingState message="Carregando dados da semana..." />
-					)}
+					<div className="hidden lg:grid lg:grid-cols-7 gap-2">
+						{days.map((day, dayIdx) => (
+							<DayCard key={day.format("YYYY-MM-DD")} day={day} dayIdx={dayIdx} compact={false} />
+						))}
+					</div>
 
-					{!loadingPlan && !loadingRecipes && !loadingMealTypes && (
-						<>
-							<div className=" overflow-auto rounded-lg border border-border">
-								<table className="w-full border-collapse">
-										<thead className="sticky top-0 z-20">
-											<tr>
-											<th className="sticky left-0 z-30 w-32 border-b border-r border-border bg-muted px-4 py-3 text-left text-sm font-semibold text-foreground">
-												Refeição
-											</th>
-
-											{days.map((d) => (
-												<th
-													key={d.format("YYYY-MM-DD")}
-													className="border-b border-border bg-muted px-3 py-3 text-center text-sm font-semibold text-foreground whitespace-nowrap min-w-[140px]"
-												>
-													<div className="text-sm font-semibold">
-														{d.format("ddd")}
-													</div>
-													<div className="text-xs text-muted-foreground">
-														{d.format("DD/MM")}
-													</div>
-												</th>
-											))}
-										</tr>
-									</thead>
-
-									<tbody>
-									{mealTypes.map((mealType, mealIdx) => (
-										<tr
-											key={mealType.id}
-											className={`transition-colors ${
-												mealIdx % 2 === 0 ? "bg-card" : "bg-muted/30"
-											} hover:bg-accent/30`}
-										>
-												<td className={`sticky left-0 z-10 border-t border-r border-border px-4 py-4 text-sm font-semibold text-foreground whitespace-nowrap ${
-													mealIdx % 2 === 0 ? "bg-card" : "bg-muted"
-												}`}>
-													{mealType.name}
-												</td>
-
-												{days.map((d) => {
-													const dateStr = d.format("YYYY-MM-DD");
-													const key = makeKey(dateStr, mealType.id);
-													const recipeIds = cells[key] || [];
-
-													return (
-														<td
-															key={key}
-															className="border-t border-border px-2 py-2 align-top min-w-[160px]"
-														>
-															<div className="space-y-1">
-																{recipeIds.length === 0 && !isOwner ? (
-																	<div className="text-xs text-muted-foreground text-center py-2">
-																		-
-																	</div>
-																) : (
-																	recipeIds.map((recipeId, idx) => {
-																	const recipe = recipes.find((r) => r.id === recipeId);
-																	return (
-																		<div
-																			key={idx}
-																			className="flex items-center gap-1 bg-muted/50 rounded px-2 py-1"
-																		>
-																			<span className="flex-1 text-xs truncate">
-																				{recipe?.name || "?"}
-																			</span>
-																			{isOwner && (
-																				<button
-																					onClick={() => {
-																						const newIds = recipeIds.filter((_, i) => i !== idx);
-																						handleChangeCell(d, mealType.id, newIds);
-																					}}
-																					className="text-destructive hover:text-destructive/80"
-																				>
-																					<Trash2 className="h-3 w-3 " />
-																				</button>
-																			)}
-																		</div>
-																	);
-																})
-																)}
-
-																{isOwner && (
-																	<Select
-																		value=""
-																		onValueChange={(recipeIdStr) => {
-																			const recipeId = Number(recipeIdStr);
-																			if (recipeId > 0) {
-																				handleChangeCell(d, mealType.id, [...recipeIds, recipeId]);
-																			}
-																		}}
-																		disabled={!isOwner}
-																	>
-																		<SelectTrigger className="h-8 w-full text-xs hover:bg-accent transition-colors">
-																			<SelectValue placeholder="+ Adicionar" />
-																		</SelectTrigger>
-																		<SelectContent>
-																	{recipes.length === 0 ? (
-																		<SelectItem
-																			disabled
-																			value="__none__"
-																			className="text-xs text-muted-foreground"
-																		>
-																			Nenhuma receita cadastrada
-																		</SelectItem>
-																	) : (
-																		recipes
-																			.filter((r) => !recipeIds.includes(r.id))
-																			.map((r) => (
-																				<SelectItem
-																					key={r.id}
-																					value={String(r.id)}
-																					className="text-xs cursor-pointer"
-																				>
-																					{r.name}
-																				</SelectItem>
-																			))
-																	)}
-																		</SelectContent>
-																	</Select>
-																)}
-															</div>
-														</td>
-													);
-												})}
-											</tr>
-										))}
-									</tbody>
-								</table>
-							</div>
-
-							<div className="flex justify-end pt-2">
+					{isOwner && (
+						<div className="flex justify-end pt-2">
 							<Button
 								onClick={handleSave}
-								disabled={!isOwner || saving || loadingPlan || loadingRecipes}
-								className="min-w-[180px]"
+								disabled={saving}
+								size="lg"
+								className="w-full sm:w-auto"
 							>
-									{saving ? (
-										<>
-											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-											Salvando...
-										</>
-									) : (
-										"Salvar plano da semana"
-									)}
-								</Button>
-							</div>
-						</>
+								{saving ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Salvando...
+									</>
+								) : (
+									"Salvar plano"
+								)}
+							</Button>
+						</div>
 					)}
-				</CardContent>
-			</Card>
+				</>
+			)}
 		</PageContainer>
 	);
 }
