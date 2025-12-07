@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { View, Text, StyleSheet, ViewStyle } from "react-native";
+import { View, Text, StyleSheet, ViewStyle, TextStyle } from "react-native";
 import { colors } from "../../theme/colors";
 
 type CardProps = {
@@ -11,20 +11,20 @@ export function Card({ children, style }: CardProps) {
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
-export function CardHeader({ children }: { children: ReactNode }) {
-  return <View style={styles.header}>{children}</View>;
+export function CardHeader({ children, style }: { children: ReactNode; style?: ViewStyle }) {
+  return <View style={[styles.header, style]}>{children}</View>;
 }
 
-export function CardTitle({ children }: { children: ReactNode }) {
-  return <Text style={styles.title}>{children}</Text>;
+export function CardTitle({ children, style }: { children: ReactNode; style?: TextStyle }) {
+  return <Text style={[styles.title, style]}>{children}</Text>;
 }
 
-export function CardDescription({ children }: { children: ReactNode }) {
-  return <Text style={styles.description}>{children}</Text>;
+export function CardDescription({ children, style }: { children: ReactNode; style?: TextStyle }) {
+  return <Text style={[styles.description, style]}>{children}</Text>;
 }
 
-export function CardContent({ children }: { children: ReactNode }) {
-  return <View style={styles.content}>{children}</View>;
+export function CardContent({ children, style }: { children: ReactNode; style?: ViewStyle }) {
+  return <View style={[styles.content, style]}>{children}</View>;
 }
 
 const styles = StyleSheet.create({

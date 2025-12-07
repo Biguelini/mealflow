@@ -1,33 +1,43 @@
+// Cores baseadas no tema claro do web (verde/sage)
 export const colors = {
-  background: "#020817",
-  foreground: "#f9fafb",
+  // Background & Foreground - Clean white/dark slate
+  background: "#f9fafb",
+  foreground: "#1a1a2e",
 
-  card: "#020617",
-  cardForeground: "#f9fafb",
-  popover: "#020617",
-  popoverForeground: "#f9fafb",
+  // Cards - Pure white
+  card: "#ffffff",
+  cardForeground: "#1a1a2e",
+  popover: "#ffffff",
+  popoverForeground: "#1a1a2e",
 
-  border: "rgba(255,255,255,0.1)",
-  input: "rgba(255,255,255,0.15)",
-  ring: "#9ca3af",
+  // Borders & Inputs - Light sage
+  border: "#e2e8e4",
+  input: "#e8ece9",
+  ring: "#22c55e",
 
-  primary: "#6366f1",
-  primaryForeground: "#020817",
+  // Primary - Fresh green (healthy, food theme)
+  primary: "#22c55e",
+  primaryForeground: "#ffffff",
 
-  secondary: "#27272a",
-  secondaryForeground: "#f9fafb",
+  // Secondary - Soft sage green
+  secondary: "#ecfdf5",
+  secondaryForeground: "#166534",
 
-  muted: "#27272a",
-  mutedForeground: "#9ca3af",
+  // Muted - Very light sage
+  muted: "#f0fdf4",
+  mutedForeground: "#6b7280",
 
-  accent: "#27272a",
-  accentForeground: "#f9fafb",
+  // Accent - Warm sage
+  accent: "#ecfdf5",
+  accentForeground: "#166534",
 
+  // Destructive - Soft red
   destructive: "#ef4444",
 
-  chart1: "#6366f1",
-  chart2: "#22c55e",
-  chart3: "#eab308",
-  chart4: "#ec4899",
-  chart5: "#f97316",
+  // Charts - Food-inspired palette
+  chart1: "#22c55e",
+  chart2: "#eab308",
+  chart3: "#f97316",
+  chart4: "#06b6d4",
+  chart5: "#ec4899",
 };
