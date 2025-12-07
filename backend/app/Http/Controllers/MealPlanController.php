@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class MealPlanController extends Controller {
-
 	public function store(Request $request) {
 		$user = $request->user();
 
@@ -27,7 +26,6 @@ class MealPlanController extends Controller {
 			'items.*.notes'                => ['nullable', 'string', 'max:255'],
 		]);
 
-
 		$household = $user->households()
 			->where('households.id', $validated['household_id'])
 			->firstOrFail();
@@ -36,15 +34,12 @@ class MealPlanController extends Controller {
 
 		$weekLabel = $weekStart->format('o-\WW');
 
-
 		$mealPlan = MealPlan::where('household_id', $household->id)
 			->whereDate('week_start_date', $weekStart->toDateString())
 			->first();
 
 		if ($mealPlan) {
-
 			$mealPlan->delete();
-
 
 			MealPlanItem::where('meal_plan_id', $mealPlan->id)->delete();
 		}
@@ -60,7 +55,6 @@ class MealPlanController extends Controller {
 
 		foreach ($validated['items'] as $itemData) {
 			$mealTypeValue = $itemData['meal_type'] ?? null;
-
 
 			if (!empty($itemData['meal_type_id'])) {
 				$mealType = \App\Models\MealType::find($itemData['meal_type_id']);
@@ -79,6 +73,7 @@ class MealPlanController extends Controller {
 				'notes'        => $itemData['notes'] ?? null,
 			]);
 		}
+
 		return response()->json(
 			$mealPlan->load(['items.recipe']),
 			201
@@ -93,11 +88,9 @@ class MealPlanController extends Controller {
 			'week'         => ['required', 'string'],
 		]);
 
-
 		$household = $user->households()
 			->where('households.id', $validated['household_id'])
 			->firstOrFail();
-
 
 		if (! str_contains($validated['week'], '-W')) {
 			return response()->json([
@@ -106,7 +99,6 @@ class MealPlanController extends Controller {
 		}
 
 		[$year, $week] = explode('-W', $validated['week'], 2);
-
 
 		$weekStart = \Illuminate\Support\Carbon::now()
 			->setISODate((int) $year, (int) $week)
@@ -134,10 +126,6 @@ class MealPlanController extends Controller {
 
 		$mealPlan = MealPlan::findOrFail($id);
 
-		$household = $user->households()
-			->where('households.id', $mealPlan->household_id)
-			->firstOrFail();
-
 		$validated = $request->validate([
 			'name'   => ['nullable', 'string', 'max:255'],
 			'notes'  => ['nullable', 'string'],
@@ -155,15 +143,12 @@ class MealPlanController extends Controller {
 			'notes' => $validated['notes'] ?? $mealPlan->notes,
 		]);
 
-
 		if (isset($validated['items']) && !empty($validated['items'])) {
 
 			MealPlanItem::where('meal_plan_id', $mealPlan->id)->delete();
 
-
 			foreach ($validated['items'] as $itemData) {
 				$mealTypeValue = $itemData['meal_type'] ?? null;
-
 
 				if (!empty($itemData['meal_type_id'])) {
 					$mealType = \App\Models\MealType::find($itemData['meal_type_id']);

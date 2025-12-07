@@ -7,7 +7,6 @@ use App\Models\Household;
 use Illuminate\Http\Request;
 
 class RecipeController extends Controller {
-
 	public function search(Request $request) {
 		$user = $request->user();
 
@@ -15,7 +14,6 @@ class RecipeController extends Controller {
 			'household_id' => ['required', 'integer', 'exists:households,id'],
 			'q'            => ['nullable', 'string', 'max:255'],
 		]);
-
 
 		$household = $user->households()
 			->where('households.id', $validated['household_id'])
@@ -32,8 +30,6 @@ class RecipeController extends Controller {
 					->orWhere('description', 'like', "%{$q}%");
 			});
 		}
-
-
 
 		$recipes = $query->orderBy('name')->paginate(20);
 
@@ -61,7 +57,6 @@ class RecipeController extends Controller {
 			'ingredients.*.notes'                => ['nullable', 'string', 'max:255'],
 		]);
 
-
 		$household = $user->households()
 			->where('households.id', $validated['household_id'])
 			->firstOrFail();
@@ -78,28 +73,27 @@ class RecipeController extends Controller {
 			'is_public'         => $validated['is_public'] ?? false,
 		]);
 
+		if (!empty($validated['ingredients'])) {
+			$pivotData = [];
+			foreach ($validated['ingredients'] as $item) {
 
-	if (!empty($validated['ingredients'])) {
-		$pivotData = [];
-		foreach ($validated['ingredients'] as $item) {
+				$ingredient = \App\Models\Ingredient::find($item['ingredient_id']);
+				$unit = $ingredient ? $ingredient->default_unit : null;
 
-			$ingredient = \App\Models\Ingredient::find($item['ingredient_id']);
-			$unit = $ingredient ? $ingredient->default_unit : null;
-			
-			$pivotData[$item['ingredient_id']] = [
-				'quantity' => $item['quantity'] ?? null,
-				'unit'     => $unit,
-				'notes'    => $item['notes'] ?? null,
-			];
+				$pivotData[$item['ingredient_id']] = [
+					'quantity' => $item['quantity'] ?? null,
+					'unit'     => $unit,
+					'notes'    => $item['notes'] ?? null,
+				];
+			}
+
+			$recipe->ingredients()->sync($pivotData);
 		}
-
-		$recipe->ingredients()->sync($pivotData);
-	}		return response()->json(
+		return response()->json(
 			$recipe->load(['ingredients', 'owner:id,name']),
 			201
 		);
 	}
-
 
 	public function show(Request $request, $id) {
 		$user = $request->user();
@@ -107,7 +101,6 @@ class RecipeController extends Controller {
 		$recipe = Recipe::with(['ingredients', 'owner:id,name'])
 			->where('id', $id)
 			->firstOrFail();
-
 
 		$user->households()
 			->where('households.id', $recipe->household_id)
@@ -146,23 +139,24 @@ class RecipeController extends Controller {
 		$recipe->fill($validated);
 		$recipe->save();
 
-	if (array_key_exists('ingredients', $validated)) {
-		$pivotData = [];
+		if (array_key_exists('ingredients', $validated)) {
+			$pivotData = [];
 
-		foreach ($validated['ingredients'] ?? [] as $item) {
+			foreach ($validated['ingredients'] ?? [] as $item) {
 
-			$ingredient = \App\Models\Ingredient::find($item['ingredient_id']);
-			$unit = $ingredient ? $ingredient->default_unit : null;
-			
-			$pivotData[$item['ingredient_id']] = [
-				'quantity' => $item['quantity'] ?? null,
-				'unit'     => $unit,
-				'notes'    => $item['notes'] ?? null,
-			];
+				$ingredient = \App\Models\Ingredient::find($item['ingredient_id']);
+				$unit = $ingredient ? $ingredient->default_unit : null;
+
+				$pivotData[$item['ingredient_id']] = [
+					'quantity' => $item['quantity'] ?? null,
+					'unit'     => $unit,
+					'notes'    => $item['notes'] ?? null,
+				];
+			}
+
+			$recipe->ingredients()->sync($pivotData);
 		}
-
-		$recipe->ingredients()->sync($pivotData);
-	}		return response()->json(
+		return response()->json(
 			$recipe->load(['ingredients', 'owner:id,name'])
 		);
 	}

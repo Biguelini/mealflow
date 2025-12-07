@@ -32,7 +32,6 @@ class HouseholdController extends Controller {
 
 		$household->users()->attach($user->id, ['role' => 'owner']);
 
-
 		$defaultMealTypes = [
 			['name' => 'Café da manhã', 'order' => 1],
 			['name' => 'Almoço', 'order' => 2],

@@ -18,7 +18,6 @@ class PantryController extends Controller {
 			'has_quantity' => ['nullable', 'boolean'],
 		]);
 
-
 		$household = $user->households()
 			->where('households.id', $validated['household_id'])
 			->firstOrFail();
@@ -55,7 +54,6 @@ class PantryController extends Controller {
 
 		return response()->json($items);
 	}
-
 
 	public function store(Request $request) {
 		$user = $request->user();
@@ -101,7 +99,6 @@ class PantryController extends Controller {
 
 		$item = PantryItem::with('household')->findOrFail($id);
 
-
 		$user->households()
 			->where('households.id', $item->household_id)
 			->firstOrFail();
@@ -113,7 +110,6 @@ class PantryController extends Controller {
 			$item->load('ingredient:id,name,default_unit')
 		);
 	}
-
 
 	public function destroy(Request $request, $id) {
 		$user = $request->user();

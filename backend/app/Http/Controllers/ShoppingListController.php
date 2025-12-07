@@ -9,170 +9,162 @@ use App\Models\ShoppingListItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
-class ShoppingListController extends Controller
-{
+class ShoppingListController extends Controller {
+	public function fromMealPlan(Request $request, $mealPlanId) {
+		$user = $request->user();
 
-    public function fromMealPlan(Request $request, $mealPlanId)
-    {
-        $user = $request->user();
+		$mealPlan = MealPlan::with(['items.recipe.ingredients'])
+			->findOrFail($mealPlanId);
 
-        $mealPlan = MealPlan::with(['items.recipe.ingredients'])
-            ->findOrFail($mealPlanId);
+		$household = $user->households()
+			->where('households.id', $mealPlan->household_id)
+			->firstOrFail();
 
+		ShoppingList::where('meal_plan_id', $mealPlan->id)->delete();
 
-        $household = $user->households()
-            ->where('households.id', $mealPlan->household_id)
-            ->firstOrFail();
+		$neededByIngredient = [];
 
+		foreach ($mealPlan->items as $item) {
+			$recipe = $item->recipe;
 
-        ShoppingList::where('meal_plan_id', $mealPlan->id)->delete();
+			if (! $recipe) {
+				continue;
+			}
 
-        $neededByIngredient = [];
+			$recipeServings = $recipe->servings ?: 1;
+			$itemServings   = $item->servings ?: $recipeServings;
 
-        foreach ($mealPlan->items as $item) {
-            $recipe = $item->recipe;
+			$factor = $itemServings / $recipeServings;
 
-            if (! $recipe) {
-                continue;
-            }
+			foreach ($recipe->ingredients as $ingredient) {
+				$ingredientId = $ingredient->id;
 
-            $recipeServings = $recipe->servings ?: 1;
-            $itemServings   = $item->servings ?: $recipeServings;
+				$baseQuantity = $ingredient->pivot->quantity ?? 0;
+				$unit = $ingredient->pivot->unit ?? $ingredient->default_unit ?? null;
 
-            $factor = $itemServings / $recipeServings;
+				if ($baseQuantity <= 0) {
+					continue;
+				}
 
-            foreach ($recipe->ingredients as $ingredient) {
-                $ingredientId = $ingredient->id;
+				$quantityForItem = $baseQuantity * $factor;
 
-                $baseQuantity = $ingredient->pivot->quantity ?? 0;
-                $unit = $ingredient->pivot->unit ?? $ingredient->default_unit ?? null;
+				if (! isset($neededByIngredient[$ingredientId])) {
+					$neededByIngredient[$ingredientId] = [
+						'quantity' => 0,
+						'unit'     => $unit,
+					];
+				}
 
-                if ($baseQuantity <= 0) {
-                    continue;
-                }
+				$neededByIngredient[$ingredientId]['quantity'] += $quantityForItem;
+			}
+		}
 
-                $quantityForItem = $baseQuantity * $factor;
-
-                if (! isset($neededByIngredient[$ingredientId])) {
-                    $neededByIngredient[$ingredientId] = [
-                        'quantity' => 0,
-                        'unit'     => $unit,
-                    ];
-                }
-
-                $neededByIngredient[$ingredientId]['quantity'] += $quantityForItem;
-            }
-        }
-
-        if (empty($neededByIngredient)) {
-            return response()->json([
-                'message' => 'Nenhum ingrediente encontrado neste plano de refeições.',
-            ], 400);
-        }
+		if (empty($neededByIngredient)) {
+			return response()->json([
+				'message' => 'Nenhum ingrediente encontrado neste plano de refeições.',
+			], 400);
+		}
 
 
-        $pantryByIngredient = PantryItem::query()
-            ->where('household_id', $household->id)
+		$pantryByIngredient = PantryItem::query()
+			->where('household_id', $household->id)
 
-            ->where(function ($q) {
-                $q->whereNull('expires_at')
-                  ->orWhereDate('expires_at', '>=', Carbon::today());
-            })
-            ->get()
-            ->groupBy('ingredient_id')
-            ->map(function ($items) {
-                return $items->sum('quantity');
-            })
-            ->all();
+			->where(function ($q) {
+				$q->whereNull('expires_at')
+					->orWhereDate('expires_at', '>=', Carbon::today());
+			})
+			->get()
+			->groupBy('ingredient_id')
+			->map(function ($items) {
+				return $items->sum('quantity');
+			})
+			->all();
 
+		$weekLabel = $mealPlan->week_label ?? $mealPlan->week_start_date->format('o-\WW');
 
-        $weekLabel = $mealPlan->week_label ?? $mealPlan->week_start_date->format('o-\WW');
+		$shoppingList = ShoppingList::create([
+			'household_id' => $household->id,
+			'meal_plan_id' => $mealPlan->id,
+			'user_id'      => $user->id,
+			'name'         => "Lista de compras {$weekLabel}",
+			'notes'        => "Gerada automaticamente a partir do plano de refeições da semana {$weekLabel}.",
+			'status'       => 'draft',
+		]);
 
-        $shoppingList = ShoppingList::create([
-            'household_id' => $household->id,
-            'meal_plan_id' => $mealPlan->id,
-            'user_id'      => $user->id,
-            'name'         => "Lista de compras {$weekLabel}",
-            'notes'        => "Gerada automaticamente a partir do plano de refeições da semana {$weekLabel}.",
-            'status'       => 'draft',
-        ]);
+		$itemsToInsert = [];
 
-        $itemsToInsert = [];
+		foreach ($neededByIngredient as $ingredientId => $data) {
+			$needed = round($data['quantity'], 2);
+			$pantry = round($pantryByIngredient[$ingredientId] ?? 0, 2);
+			$toBuy  = max($needed - $pantry, 0);
 
-        foreach ($neededByIngredient as $ingredientId => $data) {
-            $needed = round($data['quantity'], 2);
-            $pantry = round($pantryByIngredient[$ingredientId] ?? 0, 2);
-            $toBuy  = max($needed - $pantry, 0);
+			if ($toBuy <= 0) {
+				continue;
+			}
 
+			$itemsToInsert[] = [
+				'shopping_list_id' => $shoppingList->id,
+				'ingredient_id'    => $ingredientId,
+				'needed_quantity'  => $needed,
+				'pantry_quantity'  => $pantry,
+				'to_buy_quantity'  => $toBuy,
+				'unit'             => $data['unit'],
+				'notes'            => null,
+				'created_at'       => now(),
+				'updated_at'       => now(),
+			];
+		}
 
-            if ($toBuy <= 0) {
-                continue;
-            }
+		if (! empty($itemsToInsert)) {
+			ShoppingListItem::insert($itemsToInsert);
+		}
 
-            $itemsToInsert[] = [
-                'shopping_list_id' => $shoppingList->id,
-                'ingredient_id'    => $ingredientId,
-                'needed_quantity'  => $needed,
-                'pantry_quantity'  => $pantry,
-                'to_buy_quantity'  => $toBuy,
-                'unit'             => $data['unit'],
-                'notes'            => null,
-                'created_at'       => now(),
-                'updated_at'       => now(),
-            ];
-        }
+		return response()->json(
+			$shoppingList->load(['items.ingredient']),
+			201
+		);
+	}
 
-        if (! empty($itemsToInsert)) {
-            ShoppingListItem::insert($itemsToInsert);
-        }
+	public function search(Request $request) {
+		$user = $request->user();
 
-        return response()->json(
-            $shoppingList->load(['items.ingredient']),
-            201
-        );
-    }
+		$validated = $request->validate([
+			'household_id' => ['required', 'integer', 'exists:households,id'],
+			'week'         => ['required', 'string'],
+		]);
 
-    public function search(Request $request)
-    {
-        $user = $request->user();
+		$household = $user->households()
+			->where('households.id', $validated['household_id'])
+			->firstOrFail();
 
-        $validated = $request->validate([
-            'household_id' => ['required', 'integer', 'exists:households,id'],
-            'week'         => ['required', 'string'],
-        ]);
+		if (! str_contains($validated['week'], '-W')) {
+			return response()->json([
+				'message' => 'Formato de semana inválido. Use YYYY-WW.',
+			], 422);
+		}
 
-        $household = $user->households()
-            ->where('households.id', $validated['household_id'])
-            ->firstOrFail();
+		[$year, $week] = explode('-W', $validated['week'], 2);
 
-        if (! str_contains($validated['week'], '-W')) {
-            return response()->json([
-                'message' => 'Formato de semana inválido. Use YYYY-WW.',
-            ], 422);
-        }
+		$weekStart = Carbon::now()
+			->setISODate((int) $year, (int) $week)
+			->startOfWeek(Carbon::MONDAY);
 
-        [$year, $week] = explode('-W', $validated['week'], 2);
+		$shoppingList = ShoppingList::with([
+			'items.ingredient',
+			'mealPlan',
+		])
+			->where('household_id', $household->id)
+			->whereHas('mealPlan', function ($query) use ($weekStart) {
+				$query->whereDate('week_start_date', $weekStart->toDateString());
+			})
+			->first();
 
-        $weekStart = Carbon::now()
-            ->setISODate((int) $year, (int) $week)
-            ->startOfWeek(Carbon::MONDAY);
+		if (! $shoppingList) {
+			return response()->json([
+				'message' => 'Nenhuma lista de compras encontrada para esta semana.',
+			], 404);
+		}
 
-        $shoppingList = ShoppingList::with([
-            'items.ingredient',
-            'mealPlan',
-        ])
-            ->where('household_id', $household->id)
-            ->whereHas('mealPlan', function ($query) use ($weekStart) {
-                $query->whereDate('week_start_date', $weekStart->toDateString());
-            })
-            ->first();
-
-        if (! $shoppingList) {
-            return response()->json([
-                'message' => 'Nenhuma lista de compras encontrada para esta semana.',
-            ], 404);
-        }
-
-        return response()->json($shoppingList);
-    }
+		return response()->json($shoppingList);
+	}
 }

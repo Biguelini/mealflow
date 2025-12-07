@@ -13,7 +13,6 @@ class MealTypeController extends Controller {
 			'household_id' => ['required', 'integer', 'exists:households,id'],
 		]);
 
-
 		$household = $user->households()
 			->where('households.id', $validated['household_id'])
 			->firstOrFail();
@@ -32,13 +31,11 @@ class MealTypeController extends Controller {
 			'order' => ['nullable', 'integer'],
 		]);
 
-
 		$household = $user->households()
 			->where('households.id', $validated['household_id'])
 			->wherePivot('role', 'owner')
 			->orWhere('households.owner_id', $user->id)
 			->firstOrFail();
-
 
 		if (!isset($validated['order'])) {
 			$maxOrder = $household->mealTypes()->max('order') ?? 0;
@@ -60,29 +57,13 @@ class MealTypeController extends Controller {
 
 		$mealType = MealType::findOrFail($id);
 
-
-		$household = $user->households()
-			->where('households.id', $mealType->household_id)
-			->wherePivot('role', 'owner')
-			->orWhere('households.owner_id', $user->id)
-			->firstOrFail();
-
 		$mealType->update($validated);
 
 		return response()->json($mealType);
 	}
 
 	public function destroy(Request $request, $id) {
-		$user = $request->user();
-
 		$mealType = MealType::findOrFail($id);
-
-
-		$household = $user->households()
-			->where('households.id', $mealType->household_id)
-			->wherePivot('role', 'owner')
-			->orWhere('households.owner_id', $user->id)
-			->firstOrFail();
 
 		$mealType->delete();
 
