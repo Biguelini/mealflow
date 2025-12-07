@@ -11,7 +11,7 @@ import {
 	CardDescription,
 	CardContent,
 } from "@/components/ui/card";
-import { Loader2, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { PageHeader, PageContainer, ErrorMessage, LoadingState } from "@/components/common";
 
 moment.locale("pt-br");
@@ -96,14 +96,9 @@ export function DashboardPage() {
 
 	const planned = summary?.planned_meals ?? 0;
 	const completed = summary?.completed_meals ?? 0;
-	const completionPct =
-		planned > 0 ? Math.round((completed / planned) * 100) : 0;
-
+	const completionPct = planned > 0 ? Math.round((completed / planned) * 100) : 0;
 	const maxRecipeUsage = summary?.top_recipes?.[0]?.usage_count ?? 0;
-	const maxIngredientUsage =
-		summary?.top_ingredients?.[0]
-			? Number(summary.top_ingredients[0].total_quantity)
-			: 0;
+	const maxIngredientUsage = summary?.top_ingredients?.[0] ? Number(summary.top_ingredients[0].total_quantity) : 0;
 
 	const isCurrentWeek = useMemo(() => {
 		const now = moment().startOf("isoWeek");
@@ -143,9 +138,11 @@ export function DashboardPage() {
 						>
 							<ChevronLeft className="h-5 w-5" />
 						</Button>
+
 						<div className="min-w-[180px] sm:min-w-[200px] text-center text-sm font-semibold">
 							{weekRangeLabel}
 						</div>
+
 						<Button
 							variant="ghost"
 							size="icon"
@@ -172,8 +169,10 @@ export function DashboardPage() {
 						<Card>
 							<CardHeader className="pb-2">
 								<CardTitle className="text-sm">Refeições planejadas</CardTitle>
+
 								<CardDescription>Para a semana selecionada</CardDescription>
 							</CardHeader>
+
 							<CardContent>
 								<div className="text-2xl font-bold">{planned}</div>
 							</CardContent>
@@ -182,18 +181,22 @@ export function DashboardPage() {
 						<Card>
 							<CardHeader className="pb-2">
 								<CardTitle className="text-sm">Refeições realizadas</CardTitle>
+
 								<CardDescription>
 									Considerando dias até hoje
 								</CardDescription>
 							</CardHeader>
+
 							<CardContent>
 								<div className="text-2xl font-bold">{completed}</div>
+
 								<div className="mt-2 h-2 rounded-full bg-muted">
 									<div
 										className="h-2 rounded-full bg-primary transition-all"
 										style={{ width: `${Math.min(completionPct, 100)}%` }}
 									/>
 								</div>
+
 								<p className="mt-1 text-xs text-muted-foreground">
 									{completionPct}% das refeições planejadas já aconteceram.
 								</p>
@@ -205,6 +208,7 @@ export function DashboardPage() {
 								<CardTitle className="text-sm">Semana</CardTitle>
 								<CardDescription>Resumo de período</CardDescription>
 							</CardHeader>
+
 							<CardContent>
 								{summary ? (
 									<div className="space-y-1 text-sm">
@@ -214,6 +218,7 @@ export function DashboardPage() {
 												{moment(summary.week_start).format("DD/MM/YYYY")}
 											</span>
 										</div>
+
 										<div>
 											Fim:{" "}
 											<span className="font-medium">
@@ -236,24 +241,25 @@ export function DashboardPage() {
 								<CardTitle className="text-sm">
 									Top 5 receitas mais usadas
 								</CardTitle>
+
 								<CardDescription>Na semana selecionada</CardDescription>
 							</CardHeader>
+
 							<CardContent>
 								{summary && summary.top_recipes.length > 0 ? (
 									<div className="space-y-2">
 										{summary.top_recipes.map((r) => {
-											const pct =
-												maxRecipeUsage > 0
-													? (r.usage_count / maxRecipeUsage) * 100
-													: 0;
+											const pct = maxRecipeUsage > 0 ? (r.usage_count / maxRecipeUsage) * 100 : 0;
 											return (
 												<div key={r.recipe_id} className="space-y-1">
 													<div className="flex items-center justify-between text-xs">
 														<span className="truncate">{r.name}</span>
+
 														<span className="text-muted-foreground">
 															{r.usage_count}x
 														</span>
 													</div>
+
 													<div className="h-2 rounded-full bg-muted">
 														<div
 															className="h-2 rounded-full bg-primary transition-all"
@@ -277,30 +283,31 @@ export function DashboardPage() {
 								<CardTitle className="text-sm">
 									Ingredientes mais usados
 								</CardTitle>
+
 								<CardDescription>
 									Soma aproximada das quantidades das receitas da semana
 								</CardDescription>
 							</CardHeader>
+
 							<CardContent>
 								{summary && summary.top_ingredients.length > 0 ? (
 									<div className="space-y-2">
 										{summary.top_ingredients.map((ing) => {
 											const total = Number(ing.total_quantity);
-											const pct =
-												maxIngredientUsage > 0
-													? (total / maxIngredientUsage) * 100
-													: 0;
+											const pct = maxIngredientUsage > 0 ? (total / maxIngredientUsage) * 100 : 0;
 
 											return (
 												<div key={ing.ingredient_id} className="space-y-1">
 													<div className="flex items-center justify-between text-xs">
 														<span className="truncate">{ing.name}</span>
+
 														<span className="text-muted-foreground">
 															{total.toLocaleString("pt-BR", {
 																maximumFractionDigits: 1,
 															})}
 														</span>
 													</div>
+
 													<div className="h-2 rounded-full bg-muted">
 														<div
 															className="h-2 rounded-full bg-primary/80 transition-all"

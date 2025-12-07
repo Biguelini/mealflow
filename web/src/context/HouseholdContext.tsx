@@ -37,12 +37,10 @@ export function HouseholdProvider({ children }: { children: ReactNode }) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-
 	const isOwner = useMemo(() => {
 		if (!user || !currentHousehold) return false;
 		return user.id === currentHousehold.owner_id;
 	}, [user, currentHousehold]);
-
 
 	useEffect(() => {
 		async function loadHouseholds() {
@@ -56,9 +54,7 @@ export function HouseholdProvider({ children }: { children: ReactNode }) {
 
 				setHouseholds(data);
 
-
 				if (data.length > 0) {
-
 					const savedHouseholdId = localStorage.getItem("current_household_id");
 					const saved = data.find((h) => h.id === Number(savedHouseholdId));
 
@@ -102,8 +98,10 @@ export function HouseholdProvider({ children }: { children: ReactNode }) {
 
 export function useHouseholdContext() {
 	const ctx = useContext(HouseholdContext);
+
 	if (!ctx) {
 		throw new Error("useHouseholdContext must be used within HouseholdProvider");
 	}
+
 	return ctx;
 }

@@ -5,29 +5,29 @@ import { IngredientsPage } from "../pages/app/IngredientsPage";
 import { PrivateRoute } from "./PrivateRoute";
 
 export function AppRouter() {
-  return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
+	return (
+		<Routes>
+			<Route path="/login" element={<LoginPage />} />
 
-      <Route
-        path="/"
-        element={
-          <PrivateRoute>
-            <DashboardPage />
-          </PrivateRoute>
-        }
-      />
+			<Route
+				path="/"
+				element={
+					<PrivateRoute>
+						<DashboardPage />
+					</PrivateRoute>
+				}
+			/>
 
-      <Route
-        path="/ingredients"
-        element={
-          <PrivateRoute>
-            <IngredientsPage />
-          </PrivateRoute>
-        }
-      />
+			<Route
+				path="/ingredients"
+				element={
+					<PrivateRoute>
+						<IngredientsPage />
+					</PrivateRoute>
+				}
+			/>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  );
+			<Route path="*" element={<Navigate to="/" replace />} />
+		</Routes>
+	);
 }

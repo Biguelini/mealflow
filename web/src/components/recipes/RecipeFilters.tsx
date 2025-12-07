@@ -43,8 +43,10 @@ export function RecipeFilters({
 							<SelectTrigger className="h-8 w-[150px] text-xs">
 								<SelectValue placeholder="Todas" />
 							</SelectTrigger>
+
 							<SelectContent>
 								<SelectItem value="">Todas</SelectItem>
+
 								{tags.map((tag) => (
 									<SelectItem key={tag} value={tag}>
 										{tag}

@@ -52,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		});
 
 		localStorage.setItem("auth_token", data.token);
+
 		setUser(data.user);
 	}
 
@@ -65,11 +66,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		);
 
 		localStorage.setItem("auth_token", data.token);
+
 		setUser(data.user);
 	}
 
 	function logout() {
 		localStorage.removeItem("auth_token");
+
 		setUser(null);
 	}
 
@@ -90,8 +93,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuthContext() {
 	const ctx = useContext(AuthContext);
+
 	if (!ctx) {
 		throw new Error("useAuthContext must be used within AuthProvider");
 	}
+
 	return ctx;
 }

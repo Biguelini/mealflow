@@ -54,6 +54,7 @@ function IngredientRow({
 				<span className="mb-1 block text-[11px] font-medium text-muted-foreground sm:hidden">
 					Ingrediente
 				</span>
+
 				<Select
 					value={row.ingredientId}
 					onValueChange={(value) => onChange(index, "ingredientId", value)}
@@ -61,6 +62,7 @@ function IngredientRow({
 					<SelectTrigger className="h-9 w-full overflow-hidden text-ellipsis whitespace-nowrap text-sm">
 						<SelectValue placeholder="Selecione..." />
 					</SelectTrigger>
+
 					<SelectContent>
 						{ingredients.map((ing) => (
 							<SelectItem key={ing.id} value={String(ing.id)}>
@@ -80,6 +82,7 @@ function IngredientRow({
 				<span className="mb-1 block text-[11px] font-medium text-muted-foreground sm:hidden">
 					Quantidade
 				</span>
+
 				<Input
 					value={row.quantity}
 					onChange={(e) => onChange(index, "quantity", e.target.value)}
@@ -93,6 +96,7 @@ function IngredientRow({
 				<span className="mb-1 block text-[11px] font-medium text-muted-foreground sm:hidden">
 					Unidade
 				</span>
+
 				<div className="flex h-9 items-center justify-center rounded-md border border-input bg-muted/50 px-2 text-sm text-muted-foreground">
 					{displayUnit}
 				</div>
@@ -156,6 +160,7 @@ export function RecipeFormDialog({
 					<DialogTitle>
 						{isEditing ? "Editar receita" : "Nova receita"}
 					</DialogTitle>
+
 					<DialogDescription>
 						Preencha os detalhes da receita e os ingredientes.
 					</DialogDescription>
@@ -172,6 +177,7 @@ export function RecipeFormDialog({
 
 							<div className="space-y-2">
 								<Label htmlFor="name">Nome</Label>
+
 								<Input
 									id="name"
 									value={form.name}
@@ -182,6 +188,7 @@ export function RecipeFormDialog({
 
 							<div className="space-y-2">
 								<Label htmlFor="description">Descrição</Label>
+
 								<Textarea
 									id="description"
 									value={form.description}
@@ -200,6 +207,7 @@ export function RecipeFormDialog({
 										(separadas por vírgula)
 									</span>
 								</Label>
+
 								<Input
 									id="tags"
 									value={form.tagsText}
@@ -213,6 +221,7 @@ export function RecipeFormDialog({
 							<div className="space-y-2">
 								<div className="flex items-center justify-between gap-2">
 									<Label>Ingredientes</Label>
+
 									<Button
 										type="button"
 										variant="outline"

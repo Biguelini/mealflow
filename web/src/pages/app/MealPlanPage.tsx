@@ -40,7 +40,6 @@ type MealPlan = {
 	items: MealPlanItem[];
 };
 
-
 type CellMap = Record<string, number[]>;
 
 const makeKey = (dateStr: string, mealTypeId: number) => `${dateStr}::${mealTypeId}`;
@@ -56,20 +55,17 @@ export function MealPlanPage() {
 	const [loadingRecipes, setLoadingRecipes] = useState(false);
 	const [mealTypes, setMealTypes] = useState<MealType[]>([]);
 	const [loadingMealTypes, setLoadingMealTypes] = useState(false);
-
 	const [mealPlanId, setMealPlanId] = useState<number | null>(null);
 	const [cells, setCells] = useState<CellMap>({});
 	const [loadingPlan, setLoadingPlan] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-
 	const days = useMemo(
 		() =>
 			Array.from({ length: 7 }, (_, i) => moment(weekStart).add(i, "day")),
 		[weekStart]
 	);
-
 
 	const weekLabel = useMemo(() => {
 		const year = weekStart.isoWeekYear();
@@ -132,7 +128,6 @@ export function MealPlanPage() {
 
 			setMealPlanId(data.id);
 			const nextCells: CellMap = {};
-
 
 			data.items.forEach((item) => {
 				const dateStr = item.date.split("T")[0];
@@ -204,7 +199,6 @@ export function MealPlanPage() {
 				recipe_id: number;
 			}[] = [];
 
-
 			Object.entries(cells).forEach(([key, recipeIds]) => {
 				if (!recipeIds || recipeIds.length === 0) return;
 				const [date, mealTypeIdStr] = key.split("::");
@@ -263,6 +257,7 @@ export function MealPlanPage() {
 						{compact ? `${dayNames[dayIdx]}, ` : dayNames[dayIdx]}
 						<span className={compact ? "font-bold" : ""}>{day.format("DD/MM")}</span>
 					</div>
+
 					{!compact && (
 						<div className={`text-lg font-bold ${isToday ? "" : "text-foreground"}`}>
 							{day.format("DD")}
@@ -295,6 +290,7 @@ export function MealPlanPage() {
 													<span className="flex-1 truncate font-medium">
 														{recipe?.name || "?"}
 													</span>
+
 													{isOwner && (
 														<button
 															onClick={() => {
@@ -325,6 +321,7 @@ export function MealPlanPage() {
 													<Plus className={compact ? "h-4 w-4 mr-1.5" : "h-3 w-3 mr-1"} />
 													<span className="text-muted-foreground">Adicionar</span>
 												</SelectTrigger>
+
 												<SelectContent>
 													{recipes.length === 0 ? (
 														<SelectItem
@@ -402,9 +399,11 @@ export function MealPlanPage() {
 						>
 							<ChevronLeft className="h-5 w-5" />
 						</Button>
+
 						<div className="min-w-[140px] sm:min-w-[200px] text-center text-sm font-semibold">
 							{weekRangeLabel}
 						</div>
+
 						<Button
 							variant="ghost"
 							size="icon"

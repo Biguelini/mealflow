@@ -36,15 +36,6 @@ export function RecipesPage() {
 		ingredients: [{ ingredientId: "", quantity: "", unit: "" }],
 	});
 
-	const allTags = useMemo(() => {
-		const tags = new Set<string>();
-		recipes.forEach((r) => {
-			(r.tags ?? []).forEach((t) => tags.add(t));
-		});
-		return Array.from(tags).sort();
-	}, [recipes]);
-
-
 	async function loadIngredients() {
 		try {
 			setLoadingIngredients(true);

@@ -33,7 +33,6 @@ export function IngredientFormDialog({
 		name: initialData?.name || "",
 		default_unit: initialData?.default_unit || "",
 	});
-
 	const [saving, setSaving] = useState(false);
 	const [formError, setFormError] = useState<string | null>(null);
 
@@ -90,6 +89,7 @@ export function IngredientFormDialog({
 					<DialogTitle>
 						{initialData ? "Editar Ingrediente" : "Novo Ingrediente"}
 					</DialogTitle>
+
 					<DialogDescription>
 						{initialData
 							? "Atualize as informações do ingrediente"
@@ -100,6 +100,7 @@ export function IngredientFormDialog({
 				<div className="space-y-4">
 					<div>
 						<Label htmlFor="name">Nome do Ingrediente</Label>
+
 						<Input
 							id="name"
 							placeholder="ex: Tomate"
@@ -111,6 +112,7 @@ export function IngredientFormDialog({
 
 					<div>
 						<Label htmlFor="default_unit">Unidade Padrão</Label>
+
 						<Input
 							id="default_unit"
 							placeholder="ex: kg, ml, unidade"
@@ -135,6 +137,7 @@ export function IngredientFormDialog({
 					>
 						Cancelar
 					</Button>
+
 					<Button onClick={handleSave} disabled={saving}>
 						{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 						{saving ? "Salvando..." : initialData ? "Atualizar" : "Criar"}

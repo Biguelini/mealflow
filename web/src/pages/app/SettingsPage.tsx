@@ -92,7 +92,6 @@ export function SettingsPage() {
 			setError(null);
 
 			if (editingMealType) {
-
 				const updated = await apiFetch<MealType>(
 					`/meal-types/${editingMealType.id}`,
 					{
@@ -108,7 +107,6 @@ export function SettingsPage() {
 					prev.map((mt) => (mt.id === updated.id ? updated : mt))
 				);
 			} else {
-
 				const created = await apiFetch<MealType>("/meal-types", {
 					method: "POST",
 					data: {
@@ -164,7 +162,6 @@ export function SettingsPage() {
 		const swapMealType = mealTypes[newIndex];
 
 		try {
-
 			await Promise.all([
 				apiFetch(`/meal-types/${mealType.id}`, {
 					method: "PUT",
@@ -175,7 +172,6 @@ export function SettingsPage() {
 					data: { order: mealType.order },
 				}),
 			]);
-
 
 			const newMealTypes = [...mealTypes];
 			[newMealTypes[currentIndex], newMealTypes[newIndex]] = [
@@ -202,60 +198,64 @@ export function SettingsPage() {
 			<Card className="mb-6">
 				<CardHeader className="border-b">
 					<CardTitle>Aparência</CardTitle>
+
 					<CardDescription>
 						Personalize a aparência do aplicativo
 					</CardDescription>
 				</CardHeader>
+
 				<CardContent className="pt-6">
 					<div className="space-y-3">
 						<Label className="text-sm font-medium text-muted-foreground">Tema</Label>
 						<div className="grid grid-cols-3 gap-2 sm:gap-3">
 							<button
 								onClick={() => setTheme("light")}
-								className={`flex flex-col items-center gap-1.5 sm:gap-2 rounded-lg border-2 p-3 sm:p-4 transition-all ${
-									theme === "light"
-										? "border-primary bg-primary/5"
-										: "border-border hover:border-primary/50 hover:bg-muted/50"
-								}`}
+								className={`flex flex-col items-center gap-1.5 sm:gap-2 rounded-lg border-2 p-3 sm:p-4 transition-all ${theme === "light"
+									? "border-primary bg-primary/5"
+									: "border-border hover:border-primary/50 hover:bg-muted/50"
+									}`}
 							>
 								<Sun className={`h-5 w-5 sm:h-6 sm:w-6 ${theme === "light" ? "text-primary" : "text-muted-foreground"}`} />
+
 								<span className={`text-xs sm:text-sm font-medium ${theme === "light" ? "text-primary" : "text-foreground"}`}>
 									Claro
 								</span>
 							</button>
+
 							<button
 								onClick={() => setTheme("dark")}
-								className={`flex flex-col items-center gap-1.5 sm:gap-2 rounded-lg border-2 p-3 sm:p-4 transition-all ${
-									theme === "dark"
-										? "border-primary bg-primary/5"
-										: "border-border hover:border-primary/50 hover:bg-muted/50"
-								}`}
+								className={`flex flex-col items-center gap-1.5 sm:gap-2 rounded-lg border-2 p-3 sm:p-4 transition-all ${theme === "dark"
+									? "border-primary bg-primary/5"
+									: "border-border hover:border-primary/50 hover:bg-muted/50"
+									}`}
 							>
 								<Moon className={`h-5 w-5 sm:h-6 sm:w-6 ${theme === "dark" ? "text-primary" : "text-muted-foreground"}`} />
+
 								<span className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-primary" : "text-foreground"}`}>
 									Escuro
 								</span>
 							</button>
+
 							<button
 								onClick={() => setTheme("system")}
-								className={`flex flex-col items-center gap-1.5 sm:gap-2 rounded-lg border-2 p-3 sm:p-4 transition-all ${
-									theme === "system"
-										? "border-primary bg-primary/5"
-										: "border-border hover:border-primary/50 hover:bg-muted/50"
-								}`}
+								className={`flex flex-col items-center gap-1.5 sm:gap-2 rounded-lg border-2 p-3 sm:p-4 transition-all ${theme === "system"
+									? "border-primary bg-primary/5"
+									: "border-border hover:border-primary/50 hover:bg-muted/50"
+									}`}
 							>
 								<Monitor className={`h-5 w-5 sm:h-6 sm:w-6 ${theme === "system" ? "text-primary" : "text-muted-foreground"}`} />
+
 								<span className={`text-xs sm:text-sm font-medium ${theme === "system" ? "text-primary" : "text-foreground"}`}>
 									Sistema
 								</span>
 							</button>
 						</div>
 						<p className="text-xs text-muted-foreground">
-							{theme === "system" 
+							{theme === "system"
 								? "O tema será ajustado automaticamente de acordo com as preferências do seu sistema operacional."
 								: theme === "dark"
-								? "O tema escuro está ativo. Ideal para ambientes com pouca luz."
-								: "O tema claro está ativo. Ideal para ambientes bem iluminados."
+									? "O tema escuro está ativo. Ideal para ambientes com pouca luz."
+									: "O tema claro está ativo. Ideal para ambientes bem iluminados."
 							}
 						</p>
 					</div>
@@ -265,18 +265,23 @@ export function SettingsPage() {
 			<Card className="mb-6">
 				<CardHeader className="border-b">
 					<CardTitle>Informações da Household</CardTitle>
+
 					<CardDescription>
 						Detalhes sobre sua household atual
 					</CardDescription>
 				</CardHeader>
+
 				<CardContent className="pt-6">
 					<div className="space-y-3">
 						<div>
 							<div className="text-sm font-medium text-muted-foreground">Nome</div>
+
 							<div className="text-lg font-semibold">{currentHousehold?.name}</div>
 						</div>
+
 						<div>
 							<div className="text-sm font-medium text-muted-foreground">Permissão</div>
+
 							<div className="text-sm">
 								{isOwner ? (
 									<span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
@@ -298,12 +303,14 @@ export function SettingsPage() {
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<div>
 							<CardTitle>Tipos de Refeições</CardTitle>
+
 							<CardDescription>
 								Configure os tipos de refeições disponíveis para o plano semanal
 							</CardDescription>
 						</div>
+
 						{isOwner && (
-							<button 
+							<button
 								onClick={openCreateDialog}
 								className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/80  border border-transparent hover:border-gray-200 transition-colors duration-150"
 							>
@@ -320,6 +327,7 @@ export function SettingsPage() {
 					) : mealTypes.length === 0 ? (
 						<div className="text-center py-8 text-muted-foreground">
 							<p>Nenhum tipo de refeição cadastrado.</p>
+
 							{isOwner && (
 								<p className="text-sm mt-2">
 									Clique em "Adicionar" para criar o primeiro.
@@ -344,6 +352,7 @@ export function SettingsPage() {
 											>
 												<ChevronUp className="h-4 w-4" />
 											</Button>
+
 											<Button
 												variant="ghost"
 												size="icon"
@@ -355,9 +364,10 @@ export function SettingsPage() {
 											</Button>
 										</div>
 									)}
-									
+
 									<div className="flex-1">
 										<div className="font-medium">{mealType.name}</div>
+
 										<div className="text-xs text-muted-foreground">
 											Ordem: {mealType.order}
 										</div>
@@ -375,6 +385,7 @@ export function SettingsPage() {
 												>
 													<ChevronUp className="h-4 w-4" />
 												</Button>
+
 												<Button
 													variant="ghost"
 													size="icon"
@@ -385,6 +396,7 @@ export function SettingsPage() {
 													<ChevronDown className="h-4 w-4" />
 												</Button>
 											</div>
+
 											<Button
 												variant="ghost"
 												size="icon"
@@ -392,6 +404,7 @@ export function SettingsPage() {
 											>
 												<Pencil className="h-4 w-4" />
 											</Button>
+
 											<Button
 												variant="ghost"
 												size="icon"
@@ -415,6 +428,7 @@ export function SettingsPage() {
 						<DialogTitle>
 							{editingMealType ? "Editar" : "Adicionar"} Tipo de Refeição
 						</DialogTitle>
+
 						<DialogDescription>
 							{editingMealType
 								? "Atualize o nome e ordem do tipo de refeição"
@@ -425,6 +439,7 @@ export function SettingsPage() {
 					<div className="space-y-4 py-4">
 						<div className="space-y-2">
 							<Label htmlFor="name">Nome</Label>
+
 							<Input
 								id="name"
 								value={formData.name}
@@ -437,6 +452,7 @@ export function SettingsPage() {
 
 						<div className="space-y-2">
 							<Label htmlFor="order">Ordem</Label>
+
 							<Input
 								id="order"
 								type="number"
@@ -449,6 +465,7 @@ export function SettingsPage() {
 								}
 								placeholder="Ex: 4"
 							/>
+
 							<p className="text-xs text-muted-foreground">
 								Define a ordem de exibição no plano semanal
 							</p>
@@ -463,6 +480,7 @@ export function SettingsPage() {
 						>
 							Cancelar
 						</Button>
+
 						<Button onClick={handleSave} disabled={saving}>
 							{saving ? "Salvando..." : "Salvar"}
 						</Button>

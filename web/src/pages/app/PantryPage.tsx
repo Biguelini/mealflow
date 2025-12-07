@@ -63,7 +63,6 @@ function computeStatus(expiresAt: string | null): StatusInfo {
 
 	const today = moment().startOf("day");
 	const exp = moment(expiresAt, "YYYY-MM-DD").startOf("day");
-
 	const diffDays = exp.diff(today, "days");
 
 	if (diffDays < 0) {
@@ -89,7 +88,6 @@ export function PantryPage() {
 	const [loading, setLoading] = useState(false);
 	const [loadingIngredients, setLoadingIngredients] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-
 	const [search, setSearch] = useState("");
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [saving, setSaving] = useState(false);
@@ -191,13 +189,13 @@ export function PantryPage() {
 				(ing) => String(ing.id) === form.ingredientId
 			);
 
-		const payload = {
-			household_id: currentHousehold?.id,
-			ingredient_id: Number(form.ingredientId),
-			quantity: Number(form.quantity),
-			unit: selectedIngredient?.default_unit || null,
-			expires_at: form.expiresAt || null,
-			notes: form.notes || null,
+			const payload = {
+				household_id: currentHousehold?.id,
+				ingredient_id: Number(form.ingredientId),
+				quantity: Number(form.quantity),
+				unit: selectedIngredient?.default_unit || null,
+				expires_at: form.expiresAt || null,
+				notes: form.notes || null,
 			};
 
 			if (form.id) {
@@ -273,8 +271,10 @@ export function PantryPage() {
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<div>
 							<CardTitle>Meus itens</CardTitle>
+
 							<CardDescription>Gerencie os itens da sua despensa</CardDescription>
 						</div>
+
 						<Input
 							placeholder="Buscar na despensa..."
 							className="sm:max-w-xs"
@@ -331,6 +331,7 @@ export function PantryPage() {
 													<div className="font-medium min-w-0">
 														{item.ingredient.name}
 													</div>
+
 													{item.notes && (
 														<div className="text-[11px] text-muted-foreground">
 															{item.notes}
@@ -372,6 +373,7 @@ export function PantryPage() {
 															>
 																<Pencil className="h-3 w-3" />
 															</Button>
+
 															<Button
 																variant="ghost"
 																size="icon"
@@ -419,6 +421,7 @@ export function PantryPage() {
 													<div className="font-medium text-sm">
 														{item.ingredient.name}
 													</div>
+
 													{item.notes && (
 														<div className="text-xs text-muted-foreground mt-0.5">
 															{item.notes}
@@ -435,6 +438,7 @@ export function PantryPage() {
 											<div className="mt-3 grid grid-cols-3 gap-2 text-xs">
 												<div>
 													<div className="text-muted-foreground">Qtd.</div>
+
 													<div className="font-medium">
 														{Number(item.quantity).toLocaleString("pt-BR", {
 															minimumFractionDigits: 0,
@@ -444,12 +448,14 @@ export function PantryPage() {
 												</div>
 												<div>
 													<div className="text-muted-foreground">Unidade</div>
+
 													<div className="font-medium">
 														{item.unit || item.ingredient.default_unit || "-"}
 													</div>
 												</div>
 												<div>
 													<div className="text-muted-foreground">Validade</div>
+
 													<div className="font-medium">
 														{item.expires_at
 															? moment(item.expires_at).format("DD/MM/YY")
@@ -469,6 +475,7 @@ export function PantryPage() {
 														<Pencil className="h-3.5 w-3.5 mr-1.5" />
 														Editar
 													</Button>
+
 													<Button
 														variant="outline"
 														size="sm"
@@ -489,18 +496,20 @@ export function PantryPage() {
 				</CardContent>
 			</Card>
 
-		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-			<DialogContent className="w-[95vw] max-w-lg">
-				<DialogHeader>
-					<DialogTitle>
-						{form.id ? "Editar item da despensa" : "Adicionar item na despensa"}
-					</DialogTitle>
-					<DialogDescription>
-						Selecione um ingrediente e preencha a quantidade e validade.
-					</DialogDescription>
-				</DialogHeader>					<div className="space-y-4">
+			<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+				<DialogContent className="w-[95vw] max-w-lg">
+					<DialogHeader>
+						<DialogTitle>
+							{form.id ? "Editar item da despensa" : "Adicionar item na despensa"}
+						</DialogTitle>
+
+						<DialogDescription>
+							Selecione um ingrediente e preencha a quantidade e validade.
+						</DialogDescription>
+					</DialogHeader>					<div className="space-y-4">
 						<div className="space-y-2 w-full">
 							<Label>Ingrediente</Label>
+
 							<Select
 								value={form.ingredientId}
 								onValueChange={(value) => handleChangeField("ingredientId", value)}
@@ -508,10 +517,12 @@ export function PantryPage() {
 								<SelectTrigger className="w-full">
 									<SelectValue placeholder="Selecione um ingrediente" />
 								</SelectTrigger>
+
 								<SelectContent>
 									{ingredients.map((ing) => (
 										<SelectItem key={ing.id} value={String(ing.id)}>
 											{ing.name}
+
 											{ing.default_unit && (
 												<span className="text-muted-foreground ml-1">
 													({ing.default_unit})
@@ -537,6 +548,7 @@ export function PantryPage() {
 									</span>
 								)}
 							</Label>
+
 							<Input
 								value={form.quantity}
 								onChange={(e) => handleChangeField("quantity", e.target.value)}
@@ -555,6 +567,7 @@ export function PantryPage() {
 
 						<div className="space-y-2">
 							<Label>Validade (opcional)</Label>
+
 							<Input
 								type="date"
 								value={
@@ -570,6 +583,7 @@ export function PantryPage() {
 
 						<div className="space-y-2">
 							<Label>Observações (opcional)</Label>
+
 							<Textarea
 								rows={2}
 								value={form.notes}
@@ -587,12 +601,13 @@ export function PantryPage() {
 						>
 							Cancelar
 						</Button>
+
 						<Button type="button" onClick={handleSave} disabled={saving}>
 							{saving ? "Salvando..." : "Salvar item"}
 						</Button>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
-	</PageContainer>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		</PageContainer>
 	);
 }

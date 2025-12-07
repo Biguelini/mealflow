@@ -107,7 +107,6 @@ export function ShoppingListsPage() {
 		setShouldLoadOnWeekChange(true);
 	}
 
-
 	useEffect(() => {
 		if (!shoppingList) return;
 		const stored = loadExtrasFromStorage(shoppingList.id);
@@ -136,7 +135,7 @@ export function ShoppingListsPage() {
 					week: weekLabel,
 				},
 			});
-			console.log("Loaded shopping list:", data);
+
 			setShoppingList(data);
 			setShouldLoadOnWeekChange(false);
 		} catch (err: any) {
@@ -188,7 +187,6 @@ export function ShoppingListsPage() {
 		setShoppingList(null);
 
 		try {
-
 			const mealPlan = await apiFetch<{
 				id: number;
 			}>("/meal-plans/search", {
@@ -198,7 +196,6 @@ export function ShoppingListsPage() {
 					week: weekLabel,
 				},
 			});
-
 
 			const list = await apiFetch<ShoppingList>(
 				`/shopping-lists/from-meal-plan/${mealPlan.id}`,
@@ -257,9 +254,11 @@ export function ShoppingListsPage() {
 						>
 							<ChevronLeft className="h-5 w-5" />
 						</Button>
+
 						<div className="min-w-[180px] sm:min-w-[200px] text-center text-sm font-semibold">
 							{weekRangeLabel}
 						</div>
+
 						<Button
 							variant="ghost"
 							size="icon"
@@ -296,6 +295,7 @@ export function ShoppingListsPage() {
 					<CardTitle>
 						{shoppingList ? shoppingList.name : "Nenhuma lista gerada ainda"}
 					</CardTitle>
+
 					<CardDescription>
 						{shoppingList
 							? "Revise os itens, estime valores e marque o que já foi comprado."
@@ -348,6 +348,7 @@ export function ShoppingListsPage() {
 														<div className="font-medium truncate">
 															{item.ingredient.name}
 														</div>
+
 														<div className="text-[11px] text-muted-foreground">
 															Precisa:{" "}
 															{Number(item.needed_quantity).toLocaleString(
@@ -398,10 +399,12 @@ export function ShoppingListsPage() {
 															<SelectTrigger className="h-8 w-[130px] text-xs">
 																<SelectValue />
 															</SelectTrigger>
+
 															<SelectContent>
 																<SelectItem value="pending">
 																	Pendente
 																</SelectItem>
+
 																<SelectItem value="bought">
 																	Comprado
 																</SelectItem>
@@ -444,10 +447,12 @@ export function ShoppingListsPage() {
 													<div className="font-medium text-sm">
 														{item.ingredient.name}
 													</div>
+
 													<div className="text-xs text-muted-foreground mt-0.5">
 														Precisa: {Number(item.needed_quantity).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} {item.unit ?? ""}
 													</div>
 												</div>
+
 												{isBought && (
 													<span className="text-emerald-600 dark:text-emerald-400 text-lg">✓</span>
 												)}
@@ -456,10 +461,12 @@ export function ShoppingListsPage() {
 											<div className="mt-3 flex items-center justify-between gap-3 text-sm">
 												<div className="flex items-center gap-1">
 													<span className="text-muted-foreground">Comprar:</span>
+
 													<span className="font-semibold text-primary">
 														{Number(item.to_buy_quantity).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} {item.unit ?? ""}
 													</span>
 												</div>
+
 												<div className="text-xs text-muted-foreground">
 													Despensa: {Number(item.pantry_quantity).toLocaleString("pt-BR", { maximumFractionDigits: 2 })}
 												</div>
@@ -468,6 +475,7 @@ export function ShoppingListsPage() {
 											<div className="mt-3 pt-3 border-t border-border/50 flex flex-col sm:flex-row gap-2">
 												<div className="flex-1">
 													<label className="text-xs text-muted-foreground mb-1 block">Estimativa (R$)</label>
+
 													<Input
 														className="h-9 text-sm"
 														placeholder="0,00"
@@ -477,6 +485,7 @@ export function ShoppingListsPage() {
 														}
 													/>
 												</div>
+
 												<div className="flex-1">
 													<label className="text-xs text-muted-foreground mb-1 block">Status</label>
 													<Select
@@ -488,8 +497,10 @@ export function ShoppingListsPage() {
 														<SelectTrigger className="h-9 text-sm">
 															<SelectValue />
 														</SelectTrigger>
+
 														<SelectContent>
 															<SelectItem value="pending">Pendente</SelectItem>
+
 															<SelectItem value="bought">Comprado</SelectItem>
 														</SelectContent>
 													</Select>
@@ -504,6 +515,7 @@ export function ShoppingListsPage() {
 								<span className="mr-3 text-sm text-muted-foreground">
 									Total estimado:
 								</span>
+
 								<span className="font-semibold text-foreground text-lg">
 									R${" "}
 									{totalEstimated.toLocaleString("pt-BR", {

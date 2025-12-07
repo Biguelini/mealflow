@@ -30,10 +30,12 @@ export function RecipesList({
 		<Card>
 			<CardHeader>
 				<CardTitle>Receitas</CardTitle>
+
 				<CardDescription>
 					Gerencie as receitas da sua casa e vincule ingredientes.
 				</CardDescription>
 			</CardHeader>
+
 			<CardContent>
 				{error && (
 					<div className="mb-3 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
